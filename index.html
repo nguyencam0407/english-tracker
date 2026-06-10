@@ -322,6 +322,158 @@ textarea::placeholder{color:var(--ink3)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 .hidden{display:none!important}
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--border);
+  display:flex;z-index:30;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:10px 0 8px;cursor:pointer;gap:3px;
+  border:none;background:none;color:var(--ink3);
+  font-family:'Sora',sans-serif;transition:color .15s;
+}
+.nav-tab.active{color:var(--podcast)}
+.nav-tab-icon{font-size:20px;line-height:1}
+.nav-tab-label{font-size:10px;font-weight:500;letter-spacing:.02em}
+.page{display:none}
+.page.active{display:block}
+.wrap{padding-bottom:5rem!important}
+
+/* ── FLASHCARD PAGE ── */
+.fc-wrap{max-width:700px;margin:0 auto;padding:1.5rem 1rem 6rem}
+.fc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.fc-title{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.fc-modes{display:flex;gap:6px}
+.fc-mode-btn{
+  padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;
+  border:1px solid var(--border2);background:var(--paper);color:var(--ink2);
+  cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;
+}
+.fc-mode-btn.active{background:var(--podcast);color:#fff;border-color:var(--podcast)}
+
+.fc-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.fc-cat{
+  padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;
+  border:1px solid var(--border2);background:var(--paper);color:var(--ink2);
+  cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;
+}
+.fc-cat.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.fc-progress{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);padding:14px 16px;margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:14px;
+}
+.fc-prog-text{flex:1}
+.fc-prog-label{font-size:13px;font-weight:600;margin-bottom:4px}
+.fc-prog-sub{font-size:12px;color:var(--ink3)}
+.fc-prog-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:8px}
+.fc-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00875a,#1a6fc4);transition:width .4s}
+.fc-count{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--ink);white-space:nowrap}
+
+/* Card flip */
+.card-scene{perspective:1000px;margin-bottom:1.25rem;cursor:pointer}
+.card-flip{
+  width:100%;min-height:200px;position:relative;
+  transform-style:preserve-3d;transition:transform .5s ease;
+}
+.card-flip.flipped{transform:rotateY(180deg)}
+.card-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:var(--radius-xl);padding:28px 24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:1px solid var(--border);min-height:200px;
+}
+
+/* ── TTS / SPEECH ── */
+.tts-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
+.tts-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:99px;
+  border:1.5px solid var(--border2);background:var(--card);
+  color:var(--ink);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Sora',sans-serif;
+  transition:all .2s;
+}
+.tts-btn:hover{border-color:#1a6fc4;color:#1a6fc4;background:var(--speaking-bg)}
+.tts-btn.playing{
+  background:var(--speaking-bg);border-color:#1a6fc4;color:#1a6fc4;
+  animation:pulse-border 1s ease infinite;
+}
+@keyframes pulse-border{
+  0%,100%{box-shadow:0 0 0 0 rgba(26,111,196,.3)}
+  50%{box-shadow:0 0 0 6px rgba(26,111,196,0)}
+}
+.tts-icon{font-size:18px;line-height:1}
+.tts-speed{
+  padding:7px 12px;border-radius:99px;
+  border:1px solid var(--border2);background:var(--paper);
+  color:var(--ink2);font-size:12px;font-weight:500;
+  cursor:pointer;font-family:'Sora',sans-serif;
+  transition:all .15s;
+}
+.tts-speed:hover{background:var(--border)}
+.tts-speed.slow{border-color:#c47d0a;color:#c47d0a;background:var(--shadowing-bg)}
+
+.card-front{background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+.card-back{
+  background:linear-gradient(135deg,var(--podcast-bg),var(--speaking-bg));
+  border-color:var(--podcast-mid,#9FE1CB);
+  transform:rotateY(180deg);
+}
+.card-tag{
+  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:12px;
+}
+.card-back .card-tag{color:var(--podcast)}
+.card-en{font-size:18px;font-weight:600;color:var(--ink);text-align:center;line-height:1.45;margin-bottom:8px}
+.card-vi{font-size:15px;color:var(--ink2);text-align:center;line-height:1.5}
+.card-cat-badge{
+  margin-top:14px;font-size:11px;padding:3px 10px;border-radius:99px;
+  background:var(--border);color:var(--ink3);font-weight:500;
+}
+.card-hint{font-size:12px;color:var(--ink3);margin-top:8px}
+
+.fc-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.fc-act-btn{
+  padding:12px 8px;border-radius:var(--radius-lg);border:1px solid var(--border2);
+  background:var(--card);cursor:pointer;font-size:12px;font-weight:600;
+  font-family:'Sora',sans-serif;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:all .15s;
+}
+.fc-act-btn:hover{transform:translateY(-2px)}
+.fc-act-btn.know{border-color:#00875a;color:#00875a}
+.fc-act-btn.know:hover{background:var(--podcast-bg)}
+.fc-act-btn.hard{border-color:#c47d0a;color:#c47d0a}
+.fc-act-btn.hard:hover{background:var(--shadowing-bg)}
+.fc-act-btn.skip{border-color:var(--border2);color:var(--ink3)}
+.fc-act-btn .fc-act-icon{font-size:20px}
+
+.fc-nav-row{display:flex;gap:8px;justify-content:center}
+.fc-nav-btn{
+  padding:10px 24px;border-radius:var(--radius-lg);border:1px solid var(--border2);
+  background:var(--card);cursor:pointer;font-size:13px;font-weight:500;
+  font-family:'Sora',sans-serif;color:var(--ink);transition:all .15s;
+  display:flex;align-items:center;gap:6px;
+}
+.fc-nav-btn:hover{background:var(--border)}
+.fc-nav-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fc-nav-btn.primary:hover{opacity:.85}
+
+.fc-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.fc-stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);padding:12px 14px;text-align:center;
+}
+.fc-stat-val{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.fc-stat-label{font-size:11px;color:var(--ink3);margin-top:3px}
+.fc-empty{text-align:center;padding:3rem 1rem;color:var(--ink3);font-size:14px}
+
 </style>
 </head>
 <body>
@@ -387,6 +539,20 @@ textarea::placeholder{color:var(--ink3)}
     </div>
   </header>
 
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" onclick="switchPage('tracker')" id="tab-tracker">
+      <span class="nav-tab-icon">📋</span>
+      <span class="nav-tab-label">Tracker</span>
+    </button>
+    <button class="nav-tab" onclick="switchPage('flashcard')" id="tab-flashcard">
+      <span class="nav-tab-icon">🃏</span>
+      <span class="nav-tab-label">Flashcard</span>
+    </button>
+  </nav>
+
+  <!-- PAGE: Tracker -->
+  <div class="page active" id="page-tracker">
   <div class="wrap">
     <div class="week-nav">
       <button class="nav-btn" onclick="shiftWeek(-1)">&#8249;</button>
@@ -436,6 +602,85 @@ textarea::placeholder{color:var(--ink3)}
       <div id="lb-list"><div class="lb-empty">Đang tải...</div></div>
     </div>
   </div>
+  </div><!-- end page-tracker -->
+
+  <!-- PAGE: Flashcard -->
+  <div class="page" id="page-flashcard">
+    <div class="fc-wrap">
+      <div class="fc-top">
+        <div class="fc-title">🃏 Flashcard</div>
+        <div class="fc-modes">
+          <button class="fc-mode-btn active" onclick="setFcMode('order')" id="fcm-order">Theo nhóm</button>
+          <button class="fc-mode-btn" onclick="setFcMode('random')" id="fcm-random">Ngẫu nhiên</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="fc-mode-btn active" onclick="setDeck('hospitality')" id="deck-hospitality" style="flex:1">🏨 Hospitality</button>
+        <button class="fc-mode-btn" onclick="setDeck('daily')" id="deck-daily" style="flex:1">💬 Daily Life</button>
+      </div>
+      <div class="fc-cats" id="fc-cats"></div>
+      <div class="fc-progress">
+        <div class="fc-prog-text">
+          <div class="fc-prog-label" id="fc-prog-label">Câu 1/100</div>
+          <div class="fc-prog-sub" id="fc-prog-sub">Bấm thẻ để xem nghĩa tiếng Việt</div>
+          <div class="fc-prog-bar"><div class="fc-prog-fill" id="fc-prog-fill" style="width:0%"></div></div>
+        </div>
+        <div class="fc-count"><span id="fc-known">0</span>✅</div>
+      </div>
+      <div class="card-scene" onclick="flipCard()">
+        <div class="card-flip" id="card-flip">
+          <div class="card-face card-front">
+            <div class="card-tag">🇬🇧 Tiếng Anh — bấm thẻ để xem nghĩa</div>
+            <div class="card-en" id="card-en">Loading...</div>
+            <div class="card-cat-badge" id="card-cat-badge"></div>
+            <div class="tts-row" onclick="event.stopPropagation()">
+              <button class="tts-btn" id="tts-play-btn" onclick="speakCurrent()" title="Nghe tiếng Anh">
+                <span class="tts-icon">🔊</span> Nghe
+              </button>
+              <button class="tts-speed" id="tts-speed-btn" onclick="toggleSpeed()" title="Tốc độ đọc">
+                🐢 Chậm
+              </button>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-tag">🇻🇳 Tiếng Việt</div>
+            <div class="card-vi" id="card-vi"></div>
+            <div class="card-hint" id="card-hint"></div>
+            <div class="tts-row" onclick="event.stopPropagation()" style="margin-top:12px">
+              <button class="tts-btn" onclick="speakCurrent()" style="font-size:12px;padding:7px 16px">
+                <span class="tts-icon">🔊</span> Nghe lại
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-actions" id="fc-actions" style="display:none">
+        <button class="fc-act-btn know" onclick="rateCard('know')">
+          <span class="fc-act-icon">✅</span>Nhớ rồi
+        </button>
+        <button class="fc-act-btn hard" onclick="rateCard('hard')">
+          <span class="fc-act-icon">🔄</span>Khó nhớ
+        </button>
+        <button class="fc-act-btn skip" onclick="rateCard('skip')">
+          <span class="fc-act-icon">⏭</span>Bỏ qua
+        </button>
+      </div>
+      <div class="fc-nav-row">
+        <button class="fc-nav-btn" onclick="prevCard()">← Trước</button>
+        <button class="fc-nav-btn primary" onclick="nextCard()">Tiếp →</button>
+      </div>
+      <div style="margin-top:1.25rem">
+        <div class="sec">Kết quả phiên này</div>
+        <div class="fc-stats-grid">
+          <div class="fc-stat"><div class="fc-stat-val" style="color:#00875a" id="fc-s-know">0</div><div class="fc-stat-label">✅ Nhớ rồi</div></div>
+          <div class="fc-stat"><div class="fc-stat-val" style="color:#c47d0a" id="fc-s-hard">0</div><div class="fc-stat-label">🔄 Khó nhớ</div></div>
+          <div class="fc-stat"><div class="fc-stat-val" id="fc-s-left">100</div><div class="fc-stat-label">📋 Còn lại</div></div>
+        </div>
+        <button class="fc-nav-btn" style="width:100%;justify-content:center;margin-top:4px" onclick="resetCards()">🔁 Làm lại từ đầu</button>
+      </div>
+    </div>
+  </div><!-- end page-flashcard -->
+
 </div>
 
 <div class="saving" id="saving-ind"><span class="spin">↻</span> Đang lưu...</div>
@@ -447,8 +692,8 @@ textarea::placeholder{color:var(--ink3)}
 // (or enter via the ⚙️ button in the app)
 // ═══════════════════════════════════════
 const DEFAULT_CONFIG = {
-  url: 'https://jsfiwfgvpiayxjqpqrlj.supabase.co',   // e.g. https://abcxyz.supabase.co
-  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZml3Zmd2cGlheXhqcXBxcmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2OTEzNzEsImV4cCI6MjA5NTI2NzM3MX0.bsqlEJfyG2wTC0kvd8DyLdqk-VwTSOhWtSInWz-aK1U'    // your anon public key
+  url: '',   // e.g. https://abcxyz.supabase.co
+  key: ''    // your anon public key
 };
 // ═══════════════════════════════════════
 
@@ -755,6 +1000,439 @@ function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+
+// ══════════════════════════════════════
+// PAGE SWITCHING
+// ══════════════════════════════════════
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('tab-'+page).classList.add('active');
+  if(page==='flashcard') initFlashcard();
+}
+
+// ══════════════════════════════════════
+// FLASHCARD DATA — 100 Hospitality Phrases
+// ══════════════════════════════════════
+const PHRASES = [
+  // Check-in
+  {en:"Welcome to our hotel! How may I help you?", vi:"Chào mừng quý khách đến khách sạn! Tôi có thể giúp gì cho quý khách?", cat:"Check-in"},
+  {en:"May I have your name and reservation number, please?", vi:"Xin cho tôi biết tên và mã đặt phòng của quý khách?", cat:"Check-in"},
+  {en:"I'll check your reservation right away.", vi:"Tôi sẽ kiểm tra đặt phòng của quý khách ngay.", cat:"Check-in"},
+  {en:"Your room is ready. Here is your key card.", vi:"Phòng của quý khách đã sẵn sàng. Đây là thẻ phòng của quý khách.", cat:"Check-in"},
+  {en:"Check-in time is at 2 PM.", vi:"Giờ nhận phòng là 2 giờ chiều.", cat:"Check-in"},
+  {en:"Would you like a smoking or non-smoking room?", vi:"Quý khách muốn phòng hút thuốc hay không hút thuốc?", cat:"Check-in"},
+  {en:"May I see your passport or ID, please?", vi:"Cho tôi xem hộ chiếu hoặc CMND của quý khách được không?", cat:"Check-in"},
+  {en:"How many nights will you be staying?", vi:"Quý khách sẽ lưu trú bao nhiêu đêm?", cat:"Check-in"},
+  {en:"We have upgraded your room at no extra charge.", vi:"Chúng tôi đã nâng cấp phòng cho quý khách miễn phí.", cat:"Check-in"},
+  {en:"The bellboy will take your luggage to the room.", vi:"Nhân viên hành lý sẽ mang hành lý của quý khách lên phòng.", cat:"Check-in"},
+  // Check-out
+  {en:"What time would you like to check out?", vi:"Quý khách muốn trả phòng lúc mấy giờ?", cat:"Check-out"},
+  {en:"Check-out time is at 12 noon.", vi:"Giờ trả phòng là 12 giờ trưa.", cat:"Check-out"},
+  {en:"Could you please sign here?", vi:"Quý khách vui lòng ký tên vào đây?", cat:"Check-out"},
+  {en:"Would you like a copy of your receipt?", vi:"Quý khách có muốn một bản sao hóa đơn không?", cat:"Check-out"},
+  {en:"How would you like to pay — cash or card?", vi:"Quý khách muốn thanh toán bằng tiền mặt hay thẻ?", cat:"Check-out"},
+  {en:"I hope you enjoyed your stay with us.", vi:"Tôi hy vọng quý khách có kỳ lưu trú vui vẻ cùng chúng tôi.", cat:"Check-out"},
+  {en:"We look forward to welcoming you again.", vi:"Chúng tôi mong được đón tiếp quý khách lần sau.", cat:"Check-out"},
+  {en:"May I arrange a taxi for you?", vi:"Tôi có thể gọi taxi cho quý khách không?", cat:"Check-out"},
+  {en:"Please let us know if you need any assistance.", vi:"Vui lòng cho chúng tôi biết nếu quý khách cần hỗ trợ.", cat:"Check-out"},
+  {en:"Thank you for staying with us. Have a safe trip!", vi:"Cảm ơn quý khách đã lưu trú. Chúc quý khách thượng lộ bình an!", cat:"Check-out"},
+  // Restaurant
+  {en:"Good evening! Do you have a reservation?", vi:"Chào buổi tối! Quý khách có đặt bàn trước không?", cat:"Restaurant"},
+  {en:"How many people are in your party?", vi:"Bàn của quý khách có bao nhiêu người?", cat:"Restaurant"},
+  {en:"Right this way, please.", vi:"Xin mời quý khách đi lối này.", cat:"Restaurant"},
+  {en:"Here is our menu. Take your time.", vi:"Đây là thực đơn của chúng tôi. Quý khách hãy xem từ từ.", cat:"Restaurant"},
+  {en:"Are you ready to order?", vi:"Quý khách đã sẵn sàng gọi món chưa?", cat:"Restaurant"},
+  {en:"What would you like to drink?", vi:"Quý khách dùng gì uống ạ?", cat:"Restaurant"},
+  {en:"I highly recommend our chef's special today.", vi:"Tôi đặc biệt gợi ý món đặc biệt của bếp trưởng hôm nay.", cat:"Restaurant"},
+  {en:"How would you like your steak — rare, medium, or well done?", vi:"Quý khách muốn bít tết chín mức nào — tái, vừa, hay chín hẳn?", cat:"Restaurant"},
+  {en:"I'm sorry, that dish is not available today.", vi:"Xin lỗi, món đó hôm nay không còn nữa.", cat:"Restaurant"},
+  {en:"Enjoy your meal!", vi:"Chúc quý khách ngon miệng!", cat:"Restaurant"},
+  {en:"Is everything to your satisfaction?", vi:"Mọi thứ có làm hài lòng quý khách không?", cat:"Restaurant"},
+  {en:"Would you like to see the dessert menu?", vi:"Quý khách có muốn xem thực đơn tráng miệng không?", cat:"Restaurant"},
+  {en:"Can I get you anything else?", vi:"Tôi có thể giúp gì thêm cho quý khách không?", cat:"Restaurant"},
+  {en:"Shall I bring the bill?", vi:"Tôi mang hóa đơn đến cho quý khách nhé?", cat:"Restaurant"},
+  {en:"Service charge is included in the bill.", vi:"Phí dịch vụ đã được tính vào hóa đơn.", cat:"Restaurant"},
+  // Concierge
+  {en:"How can I assist you today?", vi:"Tôi có thể hỗ trợ gì cho quý khách hôm nay?", cat:"Concierge"},
+  {en:"I'd be happy to recommend some local attractions.", vi:"Tôi rất vui được giới thiệu một số điểm tham quan địa phương.", cat:"Concierge"},
+  {en:"The nearest shopping mall is about 10 minutes away.", vi:"Trung tâm mua sắm gần nhất cách đây khoảng 10 phút.", cat:"Concierge"},
+  {en:"I can book a tour for you.", vi:"Tôi có thể đặt tour cho quý khách.", cat:"Concierge"},
+  {en:"The shuttle bus departs every hour.", vi:"Xe đưa đón khởi hành mỗi giờ một lần.", cat:"Concierge"},
+  {en:"Would you like me to make a dinner reservation?", vi:"Quý khách có muốn tôi đặt bàn ăn tối không?", cat:"Concierge"},
+  {en:"The spa is open from 9 AM to 9 PM.", vi:"Spa mở cửa từ 9 giờ sáng đến 9 giờ tối.", cat:"Concierge"},
+  {en:"I'll send someone to your room right away.", vi:"Tôi sẽ cử người đến phòng quý khách ngay.", cat:"Concierge"},
+  {en:"The business center is located on the second floor.", vi:"Trung tâm kinh doanh nằm ở tầng hai.", cat:"Concierge"},
+  {en:"We offer a complimentary airport transfer.", vi:"Chúng tôi cung cấp dịch vụ đưa đón sân bay miễn phí.", cat:"Concierge"},
+  // Complaints
+  {en:"I'm terribly sorry to hear that.", vi:"Tôi thực sự rất tiếc khi nghe điều đó.", cat:"Complaints"},
+  {en:"I sincerely apologize for the inconvenience.", vi:"Tôi xin chân thành xin lỗi vì sự bất tiện này.", cat:"Complaints"},
+  {en:"We will resolve this issue immediately.", vi:"Chúng tôi sẽ giải quyết vấn đề này ngay lập tức.", cat:"Complaints"},
+  {en:"Please allow me to offer you a complimentary upgrade.", vi:"Cho phép tôi cung cấp cho quý khách một nâng cấp miễn phí.", cat:"Complaints"},
+  {en:"I'll inform the manager right away.", vi:"Tôi sẽ thông báo cho quản lý ngay.", cat:"Complaints"},
+  {en:"We take your feedback very seriously.", vi:"Chúng tôi rất coi trọng phản hồi của quý khách.", cat:"Complaints"},
+  {en:"Would you mind waiting for a moment?", vi:"Quý khách vui lòng đợi một chút được không?", cat:"Complaints"},
+  {en:"I'll have that replaced for you immediately.", vi:"Tôi sẽ đổi cái đó cho quý khách ngay.", cat:"Complaints"},
+  {en:"Is there anything I can do to make your stay more comfortable?", vi:"Có điều gì tôi có thể làm để kỳ lưu trú của quý khách thoải mái hơn không?", cat:"Complaints"},
+  {en:"We appreciate your patience.", vi:"Chúng tôi trân trọng sự kiên nhẫn của quý khách.", cat:"Complaints"},
+  // Housekeeping
+  {en:"Housekeeping! May I come in?", vi:"Phòng buồng! Tôi có thể vào không?", cat:"Housekeeping"},
+  {en:"Would you like your room cleaned now?", vi:"Quý khách có muốn dọn phòng ngay bây giờ không?", cat:"Housekeeping"},
+  {en:"We'll have that taken care of right away.", vi:"Chúng tôi sẽ xử lý ngay.", cat:"Housekeeping"},
+  {en:"Would you like extra towels?", vi:"Quý khách có cần thêm khăn tắm không?", cat:"Housekeeping"},
+  {en:"What time would you prefer to have your room serviced?", vi:"Quý khách muốn dọn phòng vào lúc mấy giờ?", cat:"Housekeeping"},
+  {en:"Please hang the 'Do Not Disturb' sign if you don't want to be disturbed.", vi:"Vui lòng treo biển 'Không làm phiền' nếu quý khách không muốn bị quấy rầy.", cat:"Housekeeping"},
+  {en:"The laundry will be ready by 6 PM.", vi:"Đồ giặt sẽ sẵn sàng vào lúc 6 giờ tối.", cat:"Housekeeping"},
+  {en:"I'll replace the amenities right away.", vi:"Tôi sẽ thay thế các tiện nghi ngay.", cat:"Housekeeping"},
+  {en:"Is there anything you need for your room?", vi:"Quý khách có cần gì thêm cho phòng không?", cat:"Housekeeping"},
+  {en:"The mini bar has been restocked.", vi:"Tủ lạnh mini đã được bổ sung.", cat:"Housekeeping"},
+  // Food & Beverage
+  {en:"Our breakfast buffet is served from 6:30 to 10:30 AM.", vi:"Bữa sáng tự chọn phục vụ từ 6:30 đến 10:30 sáng.", cat:"F&B"},
+  {en:"Would you like to order room service?", vi:"Quý khách có muốn gọi dịch vụ phòng không?", cat:"F&B"},
+  {en:"Our kitchen is open 24 hours.", vi:"Bếp của chúng tôi mở cửa 24 giờ.", cat:"F&B"},
+  {en:"Do you have any dietary restrictions?", vi:"Quý khách có chế độ ăn kiêng hay dị ứng thực phẩm không?", cat:"F&B"},
+  {en:"This dish contains nuts. Are you allergic?", vi:"Món này có chứa hạt. Quý khách có bị dị ứng không?", cat:"F&B"},
+  {en:"We offer a wide selection of wines.", vi:"Chúng tôi có nhiều lựa chọn rượu vang.", cat:"F&B"},
+  {en:"Would you like still or sparkling water?", vi:"Quý khách muốn nước không gas hay có gas?", cat:"F&B"},
+  {en:"The happy hour is from 5 to 7 PM.", vi:"Giờ happy hour là từ 5 đến 7 giờ tối.", cat:"F&B"},
+  {en:"I'll bring your order in approximately 20 minutes.", vi:"Tôi sẽ mang đơn của quý khách trong khoảng 20 phút.", cat:"F&B"},
+  {en:"Would you like your coffee with milk or black?", vi:"Quý khách muốn cà phê có sữa hay đen?", cat:"F&B"},
+  // General Service
+  {en:"It's my pleasure to assist you.", vi:"Thật vinh hạnh được hỗ trợ quý khách.", cat:"General"},
+  {en:"Please don't hesitate to contact us.", vi:"Đừng ngần ngại liên hệ với chúng tôi.", cat:"General"},
+  {en:"Your satisfaction is our top priority.", vi:"Sự hài lòng của quý khách là ưu tiên hàng đầu của chúng tôi.", cat:"General"},
+  {en:"Is there anything else I can help you with?", vi:"Còn điều gì khác tôi có thể giúp quý khách không?", cat:"General"},
+  {en:"I'll be right with you.", vi:"Tôi sẽ đến với quý khách ngay.", cat:"General"},
+  {en:"Certainly! Leave it to me.", vi:"Chắc chắn rồi! Cứ để tôi lo.", cat:"General"},
+  {en:"I'll look into that for you.", vi:"Tôi sẽ tìm hiểu điều đó cho quý khách.", cat:"General"},
+  {en:"Our staff is available around the clock.", vi:"Nhân viên của chúng tôi phục vụ 24/7.", cat:"General"},
+  {en:"Please feel free to use all our facilities.", vi:"Xin quý khách thoải mái sử dụng tất cả các tiện ích của chúng tôi.", cat:"General"},
+  {en:"We hope to exceed your expectations.", vi:"Chúng tôi hy vọng sẽ vượt quá sự mong đợi của quý khách.", cat:"General"},
+  // Telephone
+  {en:"Good morning, Front Desk. How may I direct your call?", vi:"Chào buổi sáng, Lễ tân. Tôi có thể chuyển máy cho quý khách đến đâu?", cat:"Telephone"},
+  {en:"Please hold the line.", vi:"Vui lòng giữ máy.", cat:"Telephone"},
+  {en:"I'll transfer you to the right department.", vi:"Tôi sẽ chuyển quý khách đến bộ phận phù hợp.", cat:"Telephone"},
+  {en:"I'm sorry, that line is busy at the moment.", vi:"Xin lỗi, đường dây đó hiện đang bận.", cat:"Telephone"},
+  {en:"Would you like to leave a message?", vi:"Quý khách có muốn để lại tin nhắn không?", cat:"Telephone"},
+  {en:"I'll make sure they get your message.", vi:"Tôi sẽ đảm bảo họ nhận được tin nhắn của quý khách.", cat:"Telephone"},
+  {en:"Could you please speak a little louder?", vi:"Quý khách có thể nói to hơn một chút được không?", cat:"Telephone"},
+  {en:"I'm afraid there's no answer.", vi:"Xin lỗi, không có ai nghe máy.", cat:"Telephone"},
+  {en:"May I ask who's calling?", vi:"Cho tôi hỏi ai đang gọi vậy?", cat:"Telephone"},
+  {en:"Thank you for calling. Have a great day!", vi:"Cảm ơn quý khách đã gọi. Chúc quý khách một ngày tốt lành!", cat:"Telephone"},
+];
+
+const DAILY_PHRASES = [
+  // Small Talk
+  {en:"How's it going?", vi:"Dạo này bạn thế nào?", cat:"Small Talk"},
+  {en:"Not bad, thanks for asking.", vi:"Khá ổn, cảm ơn bạn đã hỏi.", cat:"Small Talk"},
+  {en:"What have you been up to lately?", vi:"Gần đây bạn làm gì vậy?", cat:"Small Talk"},
+  {en:"Long time no see!", vi:"Lâu quá không gặp!", cat:"Small Talk"},
+  {en:"You look great today!", vi:"Hôm nay bạn trông thật tuyệt!", cat:"Small Talk"},
+  {en:"What a small world!", vi:"Thế giới thật nhỏ bé!", cat:"Small Talk"},
+  {en:"I can't believe we ran into each other!", vi:"Tôi không thể tin chúng ta lại gặp nhau ở đây!", cat:"Small Talk"},
+  {en:"The weather is lovely today, isn't it?", vi:"Thời tiết hôm nay thật đẹp phải không?", cat:"Small Talk"},
+  {en:"Are you from around here?", vi:"Bạn có phải người ở đây không?", cat:"Small Talk"},
+  {en:"It was great catching up with you!", vi:"Thật vui khi được trò chuyện với bạn!", cat:"Small Talk"},
+  // Opinions
+  {en:"In my opinion, it's worth trying.", vi:"Theo tôi, điều đó đáng để thử.", cat:"Opinions"},
+  {en:"That makes a lot of sense.", vi:"Điều đó rất có lý.", cat:"Opinions"},
+  {en:"I see your point, but I think...", vi:"Tôi hiểu ý bạn, nhưng tôi nghĩ...", cat:"Opinions"},
+  {en:"I couldn't agree more!", vi:"Tôi hoàn toàn đồng ý!", cat:"Opinions"},
+  {en:"Honestly, I'm not sure about that.", vi:"Thật ra, tôi không chắc về điều đó.", cat:"Opinions"},
+  {en:"That's an interesting perspective.", vi:"Đó là một góc nhìn thú vị.", cat:"Opinions"},
+  {en:"I beg to differ.", vi:"Tôi xin phép không đồng ý.", cat:"Opinions"},
+  {en:"It depends on the situation.", vi:"Còn tùy vào tình huống.", cat:"Opinions"},
+  {en:"I'm on the fence about it.", vi:"Tôi còn đang phân vân về điều đó.", cat:"Opinions"},
+  {en:"You make a valid point.", vi:"Bạn nêu ra một điểm hợp lý đấy.", cat:"Opinions"},
+  // Feelings
+  {en:"I'm feeling a bit under the weather.", vi:"Tôi cảm thấy hơi không khỏe.", cat:"Feelings"},
+  {en:"That really made my day!", vi:"Điều đó thực sự làm tôi vui cả ngày!", cat:"Feelings"},
+  {en:"I'm over the moon about it!", vi:"Tôi vui mừng tột đỉnh về điều đó!", cat:"Feelings"},
+  {en:"I'm a bit stressed out right now.", vi:"Tôi đang hơi căng thẳng lúc này.", cat:"Feelings"},
+  {en:"That's such a relief!", vi:"Thật nhẹ nhõm quá!", cat:"Feelings"},
+  {en:"I'm really looking forward to it.", vi:"Tôi thực sự rất mong đợi điều đó.", cat:"Feelings"},
+  {en:"I'm so proud of you!", vi:"Tôi thật sự tự hào về bạn!", cat:"Feelings"},
+  {en:"I had a rough day.", vi:"Tôi có một ngày khá tệ.", cat:"Feelings"},
+  {en:"That really got on my nerves.", vi:"Điều đó thực sự làm tôi bực mình.", cat:"Feelings"},
+  {en:"I feel like a million bucks today!", vi:"Hôm nay tôi cảm thấy tuyệt vời lắm!", cat:"Feelings"},
+  // Requests
+  {en:"Could you do me a favour?", vi:"Bạn có thể giúp tôi một việc không?", cat:"Requests"},
+  {en:"Would you mind repeating that?", vi:"Bạn có thể nhắc lại không?", cat:"Requests"},
+  {en:"Could you speak more slowly, please?", vi:"Bạn có thể nói chậm hơn không?", cat:"Requests"},
+  {en:"I was wondering if you could help me.", vi:"Tôi muốn hỏi liệu bạn có thể giúp tôi không.", cat:"Requests"},
+  {en:"Do you mind if I join you?", vi:"Bạn có phiền nếu tôi ngồi cùng không?", cat:"Requests"},
+  {en:"Can I get back to you on that?", vi:"Tôi có thể trả lời bạn sau được không?", cat:"Requests"},
+  {en:"Would it be okay if I borrowed this?", vi:"Có được không nếu tôi mượn cái này?", cat:"Requests"},
+  {en:"Feel free to ask me anything.", vi:"Cứ thoải mái hỏi tôi bất cứ điều gì.", cat:"Requests"},
+  {en:"Let me know if you need a hand.", vi:"Cứ báo tôi nếu bạn cần giúp đỡ.", cat:"Requests"},
+  {en:"Sorry to bother you, but...", vi:"Xin lỗi vì đã làm phiền, nhưng...", cat:"Requests"},
+  // Agreeing & Disagreeing
+  {en:"That's exactly what I was thinking.", vi:"Đó chính xác là những gì tôi đang nghĩ.", cat:"Agree/Disagree"},
+  {en:"I'm afraid I don't agree with you on this.", vi:"Tôi e rằng tôi không đồng ý với bạn về điều này.", cat:"Agree/Disagree"},
+  {en:"You're absolutely right.", vi:"Bạn hoàn toàn đúng.", cat:"Agree/Disagree"},
+  {en:"I'm not so sure about that.", vi:"Tôi không chắc lắm về điều đó.", cat:"Agree/Disagree"},
+  {en:"Fair enough!", vi:"Cũng có lý đấy!", cat:"Agree/Disagree"},
+  {en:"We'll have to agree to disagree.", vi:"Chúng ta sẽ phải chấp nhận rằng mỗi người một quan điểm.", cat:"Agree/Disagree"},
+  {en:"That's a good point, but have you considered...?", vi:"Đó là một ý hay, nhưng bạn đã xem xét...?", cat:"Agree/Disagree"},
+  {en:"I totally get where you're coming from.", vi:"Tôi hoàn toàn hiểu quan điểm của bạn.", cat:"Agree/Disagree"},
+  {en:"I have to disagree with that.", vi:"Tôi phải không đồng ý với điều đó.", cat:"Agree/Disagree"},
+  {en:"That's debatable.", vi:"Điều đó còn gây tranh cãi.", cat:"Agree/Disagree"},
+  // Problem Solving
+  {en:"Let's figure this out together.", vi:"Hãy cùng nhau tìm cách giải quyết.", cat:"Problem Solving"},
+  {en:"There must be a way around it.", vi:"Chắc chắn phải có cách để giải quyết.", cat:"Problem Solving"},
+  {en:"Let's look at this from a different angle.", vi:"Hãy nhìn vấn đề này từ một góc độ khác.", cat:"Problem Solving"},
+  {en:"What do you suggest we do?", vi:"Bạn gợi ý chúng ta nên làm gì?", cat:"Problem Solving"},
+  {en:"That's easier said than done.", vi:"Nói thì dễ hơn làm.", cat:"Problem Solving"},
+  {en:"Let's cross that bridge when we come to it.", vi:"Hãy giải quyết khi vấn đề đến.", cat:"Problem Solving"},
+  {en:"We need to think outside the box.", vi:"Chúng ta cần tư duy sáng tạo hơn.", cat:"Problem Solving"},
+  {en:"It's not the end of the world.", vi:"Đây không phải là ngày tận thế.", cat:"Problem Solving"},
+  {en:"Every problem has a solution.", vi:"Mọi vấn đề đều có giải pháp.", cat:"Problem Solving"},
+  {en:"Let's take it one step at a time.", vi:"Hãy giải quyết từng bước một.", cat:"Problem Solving"},
+  // Daily Routine
+  {en:"I usually grab a coffee on the way to work.", vi:"Tôi thường mua cà phê trên đường đi làm.", cat:"Daily Life"},
+  {en:"I'm swamped with work today.", vi:"Hôm nay tôi ngập đầu trong công việc.", cat:"Daily Life"},
+  {en:"Let's grab a bite to eat.", vi:"Chúng ta đi ăn gì đó đi.", cat:"Daily Life"},
+  {en:"I need to run some errands.", vi:"Tôi cần đi làm một số việc vặt.", cat:"Daily Life"},
+  {en:"I'm going to call it a day.", vi:"Tôi nghĩ hôm nay dừng ở đây thôi.", cat:"Daily Life"},
+  {en:"I hit the gym every morning.", vi:"Tôi tập gym mỗi sáng.", cat:"Daily Life"},
+  {en:"I'm stuck in traffic.", vi:"Tôi đang bị kẹt xe.", cat:"Daily Life"},
+  {en:"What are you up to this weekend?", vi:"Cuối tuần này bạn có kế hoạch gì không?", cat:"Daily Life"},
+  {en:"I'm just killing time.", vi:"Tôi đang giết thời gian thôi.", cat:"Daily Life"},
+  {en:"I've been meaning to call you.", vi:"Tôi đã định gọi cho bạn rồi.", cat:"Daily Life"},
+  // Encouragement
+  {en:"You're doing an amazing job!", vi:"Bạn đang làm rất tuyệt vời!", cat:"Encouragement"},
+  {en:"Keep it up!", vi:"Cứ tiếp tục như vậy nhé!", cat:"Encouragement"},
+  {en:"Don't give up, you're almost there!", vi:"Đừng bỏ cuộc, bạn sắp đến nơi rồi!", cat:"Encouragement"},
+  {en:"Believe in yourself!", vi:"Hãy tin vào bản thân!", cat:"Encouragement"},
+  {en:"You've got this!", vi:"Bạn làm được đấy!", cat:"Encouragement"},
+  {en:"Every step counts.", vi:"Mỗi bước đều có giá trị.", cat:"Encouragement"},
+  {en:"Take it easy, you'll get there.", vi:"Thư thả đi, bạn sẽ đến được thôi.", cat:"Encouragement"},
+  {en:"I'm rooting for you!", vi:"Tôi đang ủng hộ bạn!", cat:"Encouragement"},
+  {en:"Mistakes are how we learn.", vi:"Chúng ta học được từ những sai lầm.", cat:"Encouragement"},
+  {en:"You should be proud of yourself.", vi:"Bạn nên tự hào về bản thân.", cat:"Encouragement"},
+  // Idioms
+  {en:"It's not a big deal.", vi:"Không có gì nghiêm trọng đâu.", cat:"Idioms"},
+  {en:"That's the last straw.", vi:"Đây là giọt nước tràn ly rồi.", cat:"Idioms"},
+  {en:"I'm on the same page as you.", vi:"Tôi đồng quan điểm với bạn.", cat:"Idioms"},
+  {en:"Let's cut to the chase.", vi:"Hãy đi thẳng vào vấn đề.", cat:"Idioms"},
+  {en:"It takes two to tango.", vi:"Chuyện này cần hai người mới xảy ra được.", cat:"Idioms"},
+  {en:"That's the tip of the iceberg.", vi:"Đó chỉ là phần nổi của tảng băng.", cat:"Idioms"},
+  {en:"Once in a blue moon.", vi:"Thỉnh thoảng mới có một lần.", cat:"Idioms"},
+  {en:"Hit the nail on the head.", vi:"Nói đúng vào trọng tâm.", cat:"Idioms"},
+  {en:"Break a leg!", vi:"Chúc may mắn!", cat:"Idioms"},
+  {en:"Bite the bullet.", vi:"Cắn răng mà chịu đựng.", cat:"Idioms"},
+];
+
+const CATS = [...new Set(PHRASES.map(p=>p.cat))];
+const DAILY_CATS = [...new Set(DAILY_PHRASES.map(p=>p.cat))];
+
+let fcMode = 'order'; // 'order' or 'random'
+let fcActiveDeck = 'hospitality'; // 'hospitality' or 'daily'
+let fcActiveCat = 'all';
+let fcDeck = [];
+let fcIndex = 0;
+let fcFlipped = false;
+let fcSession = { know:0, hard:0 };
+
+function initFlashcard(){
+  renderCats();
+  buildDeck();
+}
+
+function setDeck(deck){
+  fcActiveDeck = deck;
+  fcActiveCat = 'all';
+  document.getElementById('deck-hospitality').classList.toggle('active', deck==='hospitality');
+  document.getElementById('deck-daily').classList.toggle('active', deck==='daily');
+  renderCats();
+  buildDeck();
+}
+
+function renderCats(){
+  const pool = fcActiveDeck === 'hospitality' ? PHRASES : DAILY_PHRASES;
+  const cats = [...new Set(pool.map(p=>p.cat))];
+  const catsEl = document.getElementById('fc-cats');
+  catsEl.innerHTML = `<button class="fc-cat active" onclick="setFcCat('all')" id="fcc-all">Tất cả (${pool.length})</button>` +
+    cats.map(c => {
+      const count = pool.filter(p=>p.cat===c).length;
+      return `<button class="fc-cat" onclick="setFcCat('${c}')" id="fcc-${c.replace(/[&\/]/g,'')}">${c} (${count})</button>`;
+    }).join('');
+}
+
+function setFcMode(mode){
+  fcMode = mode;
+  document.getElementById('fcm-order').classList.toggle('active', mode==='order');
+  document.getElementById('fcm-random').classList.toggle('active', mode==='random');
+  buildDeck();
+}
+
+function setFcCat(cat){
+  fcActiveCat = cat;
+  document.querySelectorAll('.fc-cat').forEach(b=>b.classList.remove('active'));
+  const id = 'fcc-'+(cat==='all'?'all':cat.replace(/&/g,''));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+  buildDeck();
+}
+
+function buildDeck(){
+  const source = fcActiveDeck === 'hospitality' ? PHRASES : DAILY_PHRASES;
+  let pool = fcActiveCat === 'all' ? [...source] : source.filter(p=>p.cat===fcActiveCat);
+  if(fcMode === 'random') pool = pool.sort(()=>Math.random()-.5);
+  fcDeck = pool;
+  fcIndex = 0;
+  fcSession = { know:0, hard:0 };
+  fcFlipped = false;
+  showCard();
+}
+
+function showCard(){
+  if(fcDeck.length === 0) return;
+  stopSpeech();
+  const card = fcDeck[fcIndex];
+  document.getElementById('card-en').textContent = card.en;
+  document.getElementById('card-vi').textContent = card.vi;
+  document.getElementById('card-cat-badge').textContent = card.cat;
+  document.getElementById('card-hint').textContent = '💡 ' + card.cat;
+  document.getElementById('card-flip').classList.remove('flipped');
+  document.getElementById('fc-actions').style.display = 'none';
+  fcFlipped = false;
+
+  const pct = Math.round((fcIndex+1)/fcDeck.length*100);
+  document.getElementById('fc-prog-label').textContent = `Câu ${fcIndex+1}/${fcDeck.length}`;
+  document.getElementById('fc-prog-sub').textContent = 'Bấm thẻ để xem nghĩa tiếng Việt';
+  document.getElementById('fc-prog-fill').style.width = pct+'%';
+  document.getElementById('fc-known').textContent = fcSession.know;
+  updateFcStats();
+}
+
+function flipCard(){
+  if(fcDeck.length === 0) return;
+  fcFlipped = !fcFlipped;
+  document.getElementById('card-flip').classList.toggle('flipped', fcFlipped);
+  document.getElementById('fc-actions').style.display = fcFlipped ? 'grid' : 'none';
+  if(fcFlipped) document.getElementById('fc-prog-sub').textContent = 'Bạn có nhớ câu này không?';
+}
+
+function rateCard(rating){
+  if(rating === 'know') fcSession.know++;
+  else if(rating === 'hard') fcSession.hard++;
+  document.getElementById('fc-known').textContent = fcSession.know;
+  updateFcStats();
+  nextCard();
+}
+
+function nextCard(){
+  if(fcIndex < fcDeck.length - 1){ fcIndex++; showCard(); }
+  else { toast('🎉 Hoàn thành '+fcDeck.length+' câu!'); }
+}
+
+function prevCard(){
+  if(fcIndex > 0){ fcIndex--; showCard(); }
+}
+
+function resetCards(){
+  buildDeck();
+  toast('🔁 Bắt đầu lại!');
+}
+
+
+// ══════════════════════════════════════
+// TEXT-TO-SPEECH
+// ══════════════════════════════════════
+let ttsSlowMode = false;
+let ttsSpeaking = false;
+let ttsVoice = null;
+
+function loadVoices(){
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer native English voices: US > GB > AU > any EN
+  const preferred = ['en-US','en-GB','en-AU','en-CA','en'];
+  for(const lang of preferred){
+    const v = voices.find(v => v.lang.startsWith(lang) && !v.name.includes('Google') === false)
+           || voices.find(v => v.lang.startsWith(lang));
+    if(v){ ttsVoice = v; break; }
+  }
+  if(!ttsVoice) ttsVoice = voices.find(v => v.lang.startsWith('en')) || null;
+}
+
+// Load voices (async on some browsers)
+if(window.speechSynthesis){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speakCurrent(){
+  if(!window.speechSynthesis){
+    toast('Trình duyệt của bạn không hỗ trợ TTS');
+    return;
+  }
+  if(fcDeck.length === 0) return;
+
+  // Stop if already speaking
+  if(ttsSpeaking){
+    window.speechSynthesis.cancel();
+    setTTSState(false);
+    return;
+  }
+
+  const text = fcDeck[fcIndex].en;
+  const utter = new SpeechSynthesisUtterance(text);
+  if(ttsVoice) utter.voice = ttsVoice;
+  utter.lang = 'en-US';
+  utter.rate = ttsSlowMode ? 0.72 : 1.0;
+  utter.pitch = 1.0;
+  utter.volume = 1.0;
+
+  utter.onstart = () => setTTSState(true);
+  utter.onend = () => setTTSState(false);
+  utter.onerror = () => setTTSState(false);
+
+  window.speechSynthesis.cancel(); // clear queue
+  window.speechSynthesis.speak(utter);
+}
+
+function setTTSState(playing){
+  ttsSpeaking = playing;
+  const btn = document.getElementById('tts-play-btn');
+  if(!btn) return;
+  if(playing){
+    btn.classList.add('playing');
+    btn.innerHTML = '<span class="tts-icon">⏹</span> Dừng';
+  } else {
+    btn.classList.remove('playing');
+    btn.innerHTML = '<span class="tts-icon">🔊</span> Nghe';
+  }
+}
+
+function toggleSpeed(){
+  ttsSlowMode = !ttsSlowMode;
+  const btn = document.getElementById('tts-speed-btn');
+  if(!btn) return;
+  if(ttsSlowMode){
+    btn.textContent = '🐇 Bình thường';
+    btn.classList.add('slow');
+  } else {
+    btn.textContent = '🐢 Chậm';
+    btn.classList.remove('slow');
+  }
+  toast(ttsSlowMode ? '🐢 Tốc độ chậm' : '🐇 Tốc độ bình thường');
+}
+
+// Stop speech when changing card
+function stopSpeech(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  setTTSState(false);
+}
+
+function updateFcStats(){
+  const left = fcDeck.length - fcSession.know - fcSession.hard;
+  document.getElementById('fc-s-know').textContent = fcSession.know;
+  document.getElementById('fc-s-hard').textContent = fcSession.hard;
+  document.getElementById('fc-s-left').textContent = Math.max(0, fcDeck.length - fcIndex);
 }
 
 // ── THEME ──
