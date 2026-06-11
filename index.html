@@ -418,6 +418,64 @@ textarea::placeholder{color:var(--ink3)}
 .tts-speed:hover{background:var(--border)}
 .tts-speed.slow{border-color:#c47d0a;color:#c47d0a;background:var(--shadowing-bg)}
 
+
+/* ── VOCAB POPUP ── */
+.vocab-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  z-index:50;display:flex;align-items:flex-end;
+  animation:fadeIn .15s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.vocab-popup{
+  background:var(--card);border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+  padding:20px 20px 32px;width:100%;
+  border-top:1px solid var(--border2);
+  animation:slideUp .2s ease;
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.vocab-word{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.vocab-phonetic{font-size:14px;color:var(--ink3);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.vocab-type{
+  display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;
+  border-radius:99px;background:var(--speaking-bg);color:var(--speaking);
+  margin-bottom:10px;
+}
+.vocab-meaning{font-size:15px;color:var(--ink);margin-bottom:8px;line-height:1.6}
+.vocab-example{font-size:13px;color:var(--ink3);font-style:italic;line-height:1.55;padding:10px 12px;background:var(--paper);border-radius:var(--radius);border-left:3px solid var(--speaking)}
+.vocab-close{
+  position:absolute;top:16px;right:16px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--bg2,var(--paper));border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;color:var(--ink2);
+}
+.vocab-loading{text-align:center;padding:1rem;color:var(--ink3);font-size:13px}
+.vocab-spin{display:inline-block;animation:spin .7s linear infinite}
+
+/* ── KEY WORDS STRIP ── */
+.kw-strip{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:12px;justify-content:center;
+}
+.kw-chip{
+  font-size:12px;font-weight:500;padding:4px 12px;
+  border-radius:99px;border:1px solid var(--border2);
+  background:var(--paper);color:var(--ink2);
+  cursor:pointer;transition:all .15s;
+  font-family:'JetBrains Mono',monospace;
+}
+.kw-chip:hover,.kw-chip:active{
+  background:var(--speaking-bg);border-color:var(--speaking);color:var(--speaking);
+}
+.kw-loading{font-size:12px;color:var(--ink3);text-align:center;width:100%}
+
+/* ── CLICKABLE WORDS IN CARD ── */
+.w{
+  cursor:pointer;border-bottom:1.5px dashed var(--speaking);
+  color:inherit;transition:color .1s;display:inline;
+}
+.w:hover,.w:active{color:var(--speaking)}
+
 .card-front{background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center}
 
 .card-back{
@@ -646,6 +704,7 @@ textarea::placeholder{color:var(--ink3)}
             <div class="card-tag">🇻🇳 Tiếng Việt</div>
             <div class="card-vi" id="card-vi"></div>
             <div class="card-hint" id="card-hint"></div>
+            <div class="kw-strip" id="kw-strip"></div>
             <div class="tts-row" onclick="event.stopPropagation()" style="margin-top:12px">
               <button class="tts-btn" onclick="speakCurrent()" style="font-size:12px;padding:7px 16px">
                 <span class="tts-icon">🔊</span> Nghe lại
@@ -683,6 +742,15 @@ textarea::placeholder{color:var(--ink3)}
 
 </div>
 
+
+<!-- VOCAB POPUP -->
+<div class="vocab-overlay hidden" id="vocab-overlay" onclick="closeVocab()">
+  <div class="vocab-popup" style="position:relative" onclick="event.stopPropagation()">
+    <div class="vocab-close" onclick="closeVocab()">✕</div>
+    <div id="vocab-content"><div class="vocab-loading"><span class="vocab-spin">⏳</span> Đang tra từ...</div></div>
+  </div>
+</div>
+
 <div class="saving" id="saving-ind"><span class="spin">↻</span> Đang lưu...</div>
 <div class="toast" id="toast"></div>
 
@@ -692,8 +760,8 @@ textarea::placeholder{color:var(--ink3)}
 // (or enter via the ⚙️ button in the app)
 // ═══════════════════════════════════════
 const DEFAULT_CONFIG = {
-  url: '',   // e.g. https://abcxyz.supabase.co
-  key: ''    // your anon public key
+  url: 'https://jsfiwfgvpiayxjqpqrlj.supabase.co',
+  key: 'sb_publishable_IrtX7mJrCcHhM7n5E8c3qw_7r2vk9ae'
 };
 // ═══════════════════════════════════════
 
@@ -736,13 +804,6 @@ function showConfig(){
 
 function initSupabase(){
   const cfg=getConfig();
-  if(!cfg.url||!cfg.key){
-    document.getElementById('config-panel').classList.remove('hidden');
-    document.getElementById('auth-panel').classList.add('hidden');
-    document.getElementById('auth-title').textContent='Cấu hình lần đầu';
-    document.getElementById('auth-sub').textContent='Nhập thông tin Supabase để bắt đầu';
-    return false;
-  }
   sb=supabase.createClient(cfg.url,cfg.key);
   return true;
 }
@@ -1293,13 +1354,16 @@ function showCard(){
   if(fcDeck.length === 0) return;
   stopSpeech();
   const card = fcDeck[fcIndex];
-  document.getElementById('card-en').textContent = card.en;
+  // Render clickable words
+  document.getElementById('card-en').innerHTML = renderClickableWords(card.en);
   document.getElementById('card-vi').textContent = card.vi;
   document.getElementById('card-cat-badge').textContent = card.cat;
   document.getElementById('card-hint').textContent = '💡 ' + card.cat;
   document.getElementById('card-flip').classList.remove('flipped');
   document.getElementById('fc-actions').style.display = 'none';
   fcFlipped = false;
+  // Load key words
+  loadKeyWords(card.en);
 
   const pct = Math.round((fcIndex+1)/fcDeck.length*100);
   document.getElementById('fc-prog-label').textContent = `Câu ${fcIndex+1}/${fcDeck.length}`;
@@ -1341,83 +1405,80 @@ function resetCards(){
 
 
 // ══════════════════════════════════════
-// TEXT-TO-SPEECH — Android WebView compatible
-// Uses SpeechSynthesis triggered by direct user gesture
+// TEXT-TO-SPEECH — ElevenLabs (natural voice)
 // ══════════════════════════════════════
+const XI_KEY = 'sk_97e80a00ac3d37f524fe6cc231c7a0a02e4983f51c55799b';
+const XI_VOICE = '21m00Tcm4TlvDq8ikWAM'; // Rachel — US English Female
+const XI_MODEL = 'eleven_turbo_v2';
+
 let ttsSlowMode = false;
 let ttsSpeaking = false;
-let ttsReady = false;
-let ttsQueue = null;
+let ttsAudio = null;
+let ttsCache = {};
 
-// Warm up speech engine on first user interaction anywhere
-function warmUpTTS(){
-  if(ttsReady || !window.speechSynthesis) return;
-  const warm = new SpeechSynthesisUtterance('');
-  warm.volume = 0;
-  window.speechSynthesis.speak(warm);
-  ttsReady = true;
-}
-document.addEventListener('touchstart', warmUpTTS, {once: true});
-document.addEventListener('click', warmUpTTS, {once: true});
-
-function speakCurrent(){
+async function speakCurrent(){
   if(fcDeck.length === 0) return;
-
-  // Stop if already speaking
-  if(ttsSpeaking){
-    stopSpeech();
-    return;
-  }
+  if(ttsSpeaking){ stopSpeech(); return; }
 
   const text = fcDeck[fcIndex].en;
+  const userEmail = currentUser?.email || '';
+  const isPremium = userEmail === 'nmcam@gmail.com';
 
-  // Android WebView needs speechSynthesis triggered in same call stack as user gesture
-  if(!window.speechSynthesis){
-    toast('Thiết bị không hỗ trợ TTS');
-    return;
+  setTTSState(true);
+
+  // ElevenLabs — chỉ dành cho premium account
+  if(isPremium){
+    try {
+      let audioUrl = ttsCache[text];
+      if(!audioUrl){
+        const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${XI_VOICE}/stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'xi-api-key': XI_KEY },
+          body: JSON.stringify({
+            text: text,
+            model_id: XI_MODEL,
+            voice_settings: {
+              stability: ttsSlowMode ? 0.85 : 0.75,
+              similarity_boost: 0.80,
+              style: 0.20,
+              use_speaker_boost: true
+            }
+          })
+        });
+        if(!res.ok) throw new Error('ElevenLabs error ' + res.status);
+        const blob = await res.blob();
+        audioUrl = URL.createObjectURL(blob);
+        ttsCache[text] = audioUrl;
+      }
+      ttsAudio = new Audio(audioUrl);
+      ttsAudio.playbackRate = ttsSlowMode ? 0.80 : 1.0;
+      ttsAudio.onended = () => setTTSState(false);
+      ttsAudio.onerror = () => { setTTSState(false); fallbackSpeak(text); };
+      await ttsAudio.play();
+      return;
+    } catch(e){
+      setTTSState(false);
+    }
   }
 
-  // Cancel any pending
-  window.speechSynthesis.cancel();
+  // Fallback — Web Speech API cho tất cả user còn lại
+  fallbackSpeak(text);
+}
 
-  // Small delay lets cancel() finish before new speak()
-  setTimeout(() => {
-    const voices = window.speechSynthesis.getVoices();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang  = 'en-US';
-    utter.rate  = ttsSlowMode ? 0.65 : 0.9;
-    utter.pitch = 1.0;
-    utter.volume = 1.0;
-
-    // Pick best English voice
-    const pick =
-      voices.find(v => v.lang === 'en-US' && v.localService) ||
-      voices.find(v => v.lang === 'en-GB' && v.localService) ||
-      voices.find(v => v.lang.startsWith('en') && v.localService) ||
-      voices.find(v => v.lang.startsWith('en-US')) ||
-      voices.find(v => v.lang.startsWith('en')) ||
-      null;
-    if(pick) utter.voice = pick;
-
-    utter.onstart = () => setTTSState(true);
-    utter.onend   = () => setTTSState(false);
-    utter.onerror = (e) => {
-      setTTSState(false);
-      if(e.error !== 'interrupted') toast('Lỗi TTS: ' + e.error);
-    };
-
-    window.speechSynthesis.speak(utter);
-
-    // Android WebView bug: sometimes hangs — resume every 5s
-    const resumeTimer = setInterval(() => {
-      if(!ttsSpeaking){ clearInterval(resumeTimer); return; }
-      if(window.speechSynthesis.paused) window.speechSynthesis.resume();
-    }, 5000);
-
-  }, 50);
-
-  // Optimistically set state so button feels responsive
-  setTTSState(true);
+function fallbackSpeak(text){
+  if(!window.speechSynthesis){ setTTSState(false); return; }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang  = 'en-US';
+  utter.rate  = ttsSlowMode ? 0.7 : 0.9;
+  utter.pitch = 1.0;
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(v=>v.lang==='en-US') || voices.find(v=>v.lang.startsWith('en'));
+  if(v) utter.voice = v;
+  utter.onstart = () => setTTSState(true);
+  utter.onend   = () => setTTSState(false);
+  utter.onerror = () => setTTSState(false);
+  speechSynthesis.cancel();
+  setTimeout(() => speechSynthesis.speak(utter), 50);
 }
 
 function setTTSState(playing){
@@ -1448,7 +1509,8 @@ function toggleSpeed(){
 }
 
 function stopSpeech(){
-  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  if(ttsAudio){ ttsAudio.pause(); ttsAudio.src=''; ttsAudio=null; }
+  if(window.speechSynthesis) speechSynthesis.cancel();
   setTTSState(false);
 }
 
@@ -1458,6 +1520,119 @@ function updateFcStats(){
   document.getElementById('fc-s-hard').textContent = fcSession.hard;
   document.getElementById('fc-s-left').textContent = Math.max(0, fcDeck.length - fcIndex);
 }
+
+
+// ══════════════════════════════════════
+// VOCAB LOOKUP — AI powered
+// ══════════════════════════════════════
+let vocabCache = {};
+let kwCache = {};
+
+// Render card-en as clickable words
+function renderClickableWords(text){
+  return text.split(/(\s+)/).map(token => {
+    const word = token.trim();
+    if(!word || word.match(/^[.,!?;:'"()\-]+$/)) return token;
+    const clean = word.replace(/[^a-zA-Z'-]/g,'');
+    if(clean.length < 3) return token;
+    return `<span class="w" onclick="lookupWord('${clean.toLowerCase()}')">${token}</span>`;
+  }).join('');
+}
+
+async function lookupWord(word){
+  document.getElementById('vocab-overlay').classList.remove('hidden');
+  document.getElementById('vocab-content').innerHTML = '<div class="vocab-loading"><span class="vocab-spin">⏳</span> Đang tra từ <b>'+word+'</b>...</div>';
+
+  // Check cache
+  if(vocabCache[word]){
+    renderVocabPopup(vocabCache[word]);
+    return;
+  }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{
+          role:'user',
+          content:`Give me vocabulary info for the English word "${word}" used in hospitality/daily conversation context. Respond ONLY in this exact JSON format, no markdown:
+{"word":"${word}","phonetic":"/fəˈnɛtɪk/","type":"verb/noun/adj/adv","meaning_vi":"nghĩa tiếng Việt ngắn gọn","example":"Short example sentence in English"}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g,'').trim();
+    const vocab = JSON.parse(clean);
+    vocabCache[word] = vocab;
+    renderVocabPopup(vocab);
+  } catch(e){
+    document.getElementById('vocab-content').innerHTML = `
+      <div class="vocab-word">${word}</div>
+      <div class="vocab-meaning">Không tra được lúc này, thử lại nhé!</div>`;
+  }
+}
+
+function renderVocabPopup(v){
+  document.getElementById('vocab-content').innerHTML = `
+    <div class="vocab-word">${v.word}</div>
+    <div class="vocab-phonetic">${v.phonetic||''}</div>
+    <span class="vocab-type">${v.type||'từ'}</span>
+    <div class="vocab-meaning">🇻🇳 ${v.meaning_vi}</div>
+    ${v.example?`<div class="vocab-example">"${v.example}"</div>`:''}
+  `;
+}
+
+function closeVocab(){
+  document.getElementById('vocab-overlay').classList.add('hidden');
+}
+
+// Load key words for current card
+async function loadKeyWords(text){
+  const kw = document.getElementById('kw-strip');
+  if(!kw) return;
+
+  if(kwCache[text]){
+    renderKeyWords(kwCache[text]);
+    return;
+  }
+
+  kw.innerHTML = '<div class="kw-loading">⏳ Đang phân tích từ khóa...</div>';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:150,
+        messages:[{
+          role:'user',
+          content:`Extract 3-5 most important vocabulary words from this sentence for an English learner: "${text}". Respond ONLY as JSON array of strings, no markdown: ["word1","word2","word3"]`
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text||'[]';
+    const words = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    kwCache[text] = words;
+    renderKeyWords(words);
+  } catch(e){
+    if(kw) kw.innerHTML = '';
+  }
+}
+
+function renderKeyWords(words){
+  const kw = document.getElementById('kw-strip');
+  if(!kw) return;
+  kw.innerHTML = words.map(w =>
+    `<span class="kw-chip" onclick="lookupWord('${w.toLowerCase()}')">${w}</span>`
+  ).join('');
+}
+
 
 // ── THEME ──
 function applyTheme(mode){
