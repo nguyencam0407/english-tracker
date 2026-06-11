@@ -6,7 +6,6 @@
 <title>English Daily Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1342,48 +1341,83 @@ function resetCards(){
 
 
 // ══════════════════════════════════════
-// TEXT-TO-SPEECH — ResponsiveVoice (Android WebView compatible)
+// TEXT-TO-SPEECH — Android WebView compatible
+// Uses SpeechSynthesis triggered by direct user gesture
 // ══════════════════════════════════════
 let ttsSlowMode = false;
 let ttsSpeaking = false;
+let ttsReady = false;
+let ttsQueue = null;
+
+// Warm up speech engine on first user interaction anywhere
+function warmUpTTS(){
+  if(ttsReady || !window.speechSynthesis) return;
+  const warm = new SpeechSynthesisUtterance('');
+  warm.volume = 0;
+  window.speechSynthesis.speak(warm);
+  ttsReady = true;
+}
+document.addEventListener('touchstart', warmUpTTS, {once: true});
+document.addEventListener('click', warmUpTTS, {once: true});
 
 function speakCurrent(){
   if(fcDeck.length === 0) return;
-  if(ttsSpeaking){ stopSpeech(); return; }
 
-  const text = fcDeck[fcIndex].en;
-  const rate = ttsSlowMode ? 0.6 : 0.9;
-
-  // Try ResponsiveVoice first (best Android WebView support)
-  if(typeof responsiveVoice !== 'undefined'){
-    setTTSState(true);
-    responsiveVoice.speak(text, 'US English Female', {
-      rate: rate,
-      onstart: () => setTTSState(true),
-      onend:   () => setTTSState(false),
-      onerror: () => { setTTSState(false); fallbackTTS(text); }
-    });
+  // Stop if already speaking
+  if(ttsSpeaking){
+    stopSpeech();
     return;
   }
 
-  // Fallback: Web Speech API
-  fallbackTTS(text);
-}
+  const text = fcDeck[fcIndex].en;
 
-function fallbackTTS(text){
-  if(!window.speechSynthesis){ toast('Không hỗ trợ TTS trên thiết bị này'); return; }
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang  = 'en-US';
-  utter.rate  = ttsSlowMode ? 0.65 : 0.9;
-  utter.pitch = 1.0;
-  const voices = speechSynthesis.getVoices();
-  const enVoice = voices.find(v=>v.lang.startsWith('en-US')) || voices.find(v=>v.lang.startsWith('en'));
-  if(enVoice) utter.voice = enVoice;
-  utter.onstart = () => setTTSState(true);
-  utter.onend   = () => setTTSState(false);
-  utter.onerror = () => setTTSState(false);
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utter);
+  // Android WebView needs speechSynthesis triggered in same call stack as user gesture
+  if(!window.speechSynthesis){
+    toast('Thiết bị không hỗ trợ TTS');
+    return;
+  }
+
+  // Cancel any pending
+  window.speechSynthesis.cancel();
+
+  // Small delay lets cancel() finish before new speak()
+  setTimeout(() => {
+    const voices = window.speechSynthesis.getVoices();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang  = 'en-US';
+    utter.rate  = ttsSlowMode ? 0.65 : 0.9;
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+
+    // Pick best English voice
+    const pick =
+      voices.find(v => v.lang === 'en-US' && v.localService) ||
+      voices.find(v => v.lang === 'en-GB' && v.localService) ||
+      voices.find(v => v.lang.startsWith('en') && v.localService) ||
+      voices.find(v => v.lang.startsWith('en-US')) ||
+      voices.find(v => v.lang.startsWith('en')) ||
+      null;
+    if(pick) utter.voice = pick;
+
+    utter.onstart = () => setTTSState(true);
+    utter.onend   = () => setTTSState(false);
+    utter.onerror = (e) => {
+      setTTSState(false);
+      if(e.error !== 'interrupted') toast('Lỗi TTS: ' + e.error);
+    };
+
+    window.speechSynthesis.speak(utter);
+
+    // Android WebView bug: sometimes hangs — resume every 5s
+    const resumeTimer = setInterval(() => {
+      if(!ttsSpeaking){ clearInterval(resumeTimer); return; }
+      if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+    }, 5000);
+
+  }, 50);
+
+  // Optimistically set state so button feels responsive
+  setTTSState(true);
 }
 
 function setTTSState(playing){
@@ -1414,8 +1448,7 @@ function toggleSpeed(){
 }
 
 function stopSpeech(){
-  if(typeof responsiveVoice !== 'undefined') responsiveVoice.cancel();
-  if(window.speechSynthesis) speechSynthesis.cancel();
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
   setTTSState(false);
 }
 
