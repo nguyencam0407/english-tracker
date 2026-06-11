@@ -6,6 +6,7 @@
 <title>English Daily Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1341,58 +1342,48 @@ function resetCards(){
 
 
 // ══════════════════════════════════════
-// TEXT-TO-SPEECH
+// TEXT-TO-SPEECH — ResponsiveVoice (Android WebView compatible)
 // ══════════════════════════════════════
 let ttsSlowMode = false;
 let ttsSpeaking = false;
-let ttsVoice = null;
-
-function loadVoices(){
-  const voices = window.speechSynthesis.getVoices();
-  // Prefer native English voices: US > GB > AU > any EN
-  const preferred = ['en-US','en-GB','en-AU','en-CA','en'];
-  for(const lang of preferred){
-    const v = voices.find(v => v.lang.startsWith(lang) && !v.name.includes('Google') === false)
-           || voices.find(v => v.lang.startsWith(lang));
-    if(v){ ttsVoice = v; break; }
-  }
-  if(!ttsVoice) ttsVoice = voices.find(v => v.lang.startsWith('en')) || null;
-}
-
-// Load voices (async on some browsers)
-if(window.speechSynthesis){
-  loadVoices();
-  window.speechSynthesis.onvoiceschanged = loadVoices;
-}
 
 function speakCurrent(){
-  if(!window.speechSynthesis){
-    toast('Trình duyệt của bạn không hỗ trợ TTS');
-    return;
-  }
   if(fcDeck.length === 0) return;
-
-  // Stop if already speaking
-  if(ttsSpeaking){
-    window.speechSynthesis.cancel();
-    setTTSState(false);
-    return;
-  }
+  if(ttsSpeaking){ stopSpeech(); return; }
 
   const text = fcDeck[fcIndex].en;
+  const rate = ttsSlowMode ? 0.6 : 0.9;
+
+  // Try ResponsiveVoice first (best Android WebView support)
+  if(typeof responsiveVoice !== 'undefined'){
+    setTTSState(true);
+    responsiveVoice.speak(text, 'US English Female', {
+      rate: rate,
+      onstart: () => setTTSState(true),
+      onend:   () => setTTSState(false),
+      onerror: () => { setTTSState(false); fallbackTTS(text); }
+    });
+    return;
+  }
+
+  // Fallback: Web Speech API
+  fallbackTTS(text);
+}
+
+function fallbackTTS(text){
+  if(!window.speechSynthesis){ toast('Không hỗ trợ TTS trên thiết bị này'); return; }
   const utter = new SpeechSynthesisUtterance(text);
-  if(ttsVoice) utter.voice = ttsVoice;
-  utter.lang = 'en-US';
-  utter.rate = ttsSlowMode ? 0.72 : 1.0;
+  utter.lang  = 'en-US';
+  utter.rate  = ttsSlowMode ? 0.65 : 0.9;
   utter.pitch = 1.0;
-  utter.volume = 1.0;
-
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v=>v.lang.startsWith('en-US')) || voices.find(v=>v.lang.startsWith('en'));
+  if(enVoice) utter.voice = enVoice;
   utter.onstart = () => setTTSState(true);
-  utter.onend = () => setTTSState(false);
+  utter.onend   = () => setTTSState(false);
   utter.onerror = () => setTTSState(false);
-
-  window.speechSynthesis.cancel(); // clear queue
-  window.speechSynthesis.speak(utter);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
 }
 
 function setTTSState(playing){
@@ -1422,9 +1413,9 @@ function toggleSpeed(){
   toast(ttsSlowMode ? '🐢 Tốc độ chậm' : '🐇 Tốc độ bình thường');
 }
 
-// Stop speech when changing card
 function stopSpeech(){
-  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  if(typeof responsiveVoice !== 'undefined') responsiveVoice.cancel();
+  if(window.speechSynthesis) speechSynthesis.cancel();
   setTTSState(false);
 }
 
