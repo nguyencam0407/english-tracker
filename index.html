@@ -321,6 +321,68 @@ textarea::placeholder{color:var(--ink3)}
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
+
+/* ── VOCAB NOTES ── */
+.vn-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-xl);padding:16px 18px;
+  margin-bottom:1rem;
+}
+.vn-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.vn-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.vn-count{
+  font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;
+  background:var(--writing-bg);color:var(--writing);
+  font-family:'JetBrains Mono',monospace;
+}
+.vn-input-row{display:flex;gap:8px;margin-bottom:14px}
+.vn-input{
+  flex:1;padding:9px 12px;font-size:13px;
+  border:1px solid var(--border2);border-radius:var(--radius);
+  background:var(--paper);color:var(--ink);
+  font-family:'Sora',sans-serif;outline:none;
+  transition:border-color .15s;
+}
+.vn-input:focus{border-color:var(--writing)}
+.vn-input::placeholder{color:var(--ink3)}
+.vn-add-btn{
+  padding:9px 16px;border-radius:var(--radius);
+  border:none;background:var(--writing);color:#fff;
+  font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:opacity .15s;
+  white-space:nowrap;
+}
+.vn-add-btn:hover{opacity:.85}
+.vn-list{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto}
+.vn-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius);
+  background:var(--paper);border:1px solid var(--border);
+  transition:border-color .15s;
+}
+.vn-item:hover{border-color:var(--border2)}
+.vn-word{font-size:13px;font-weight:600;color:var(--ink);min-width:100px}
+.vn-sep{font-size:12px;color:var(--ink3)}
+.vn-meaning{font-size:13px;color:var(--ink2);flex:1}
+.vn-date{font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.vn-del{
+  background:none;border:none;cursor:pointer;
+  color:var(--ink3);font-size:14px;padding:2px 6px;
+  border-radius:var(--radius);transition:all .15s;
+  flex-shrink:0;
+}
+.vn-del:hover{background:#fdecea;color:#c0392b}
+.vn-empty{text-align:center;padding:1.5rem;color:var(--ink3);font-size:13px}
+.vn-search{
+  width:100%;padding:8px 12px;font-size:13px;
+  border:1px solid var(--border2);border-radius:var(--radius);
+  background:var(--paper);color:var(--ink);
+  font-family:'Sora',sans-serif;outline:none;
+  margin-bottom:10px;transition:border-color .15s;
+}
+.vn-search:focus{border-color:var(--writing)}
+.vn-search::placeholder{color:var(--ink3)}
+
 .hidden{display:none!important}
 /* ── BOTTOM NAV ── */
 .bottom-nav{
@@ -659,6 +721,25 @@ textarea::placeholder{color:var(--ink3)}
       </div>
       <div id="lb-list"><div class="lb-empty">Đang tải...</div></div>
     </div>
+
+    <!-- VOCAB NOTES -->
+    <div class="sec" style="margin-top:1.25rem">📝 Từ vựng đã ghi</div>
+    <div class="vn-section">
+      <div class="vn-header">
+        <div class="vn-title">✏️ Thêm từ mới</div>
+        <span class="vn-count" id="vn-count">0 từ</span>
+      </div>
+      <div class="vn-input-row">
+        <input class="vn-input" id="vn-word" placeholder="Từ tiếng Anh..." onkeydown="if(event.key==='Tab'){event.preventDefault();document.getElementById('vn-meaning').focus()}"/>
+        <input class="vn-input" id="vn-meaning" placeholder="Nghĩa tiếng Việt..." onkeydown="if(event.key==='Enter')addVocabNote()"/>
+        <button class="vn-add-btn" onclick="addVocabNote()">+ Thêm</button>
+      </div>
+      <input class="vn-search" id="vn-search" placeholder="🔍 Tìm từ đã ghi..." oninput="renderVocabNotes()"/>
+      <div class="vn-list" id="vn-list">
+        <div class="vn-empty">Chưa có từ nào — thêm từ mới bên trên!</div>
+      </div>
+    </div>
+
   </div>
   </div><!-- end page-tracker -->
 
@@ -866,6 +947,7 @@ async function showApp(){
   document.getElementById('user-name').textContent=name;
   document.getElementById('user-avatar').textContent=name[0].toUpperCase();
   await loadWeekData();
+  await loadVocabNotes();
   render();
   loadLeaderboard();
 }
@@ -1631,6 +1713,97 @@ function renderKeyWords(words){
   kw.innerHTML = words.map(w =>
     `<span class="kw-chip" onclick="lookupWord('${w.toLowerCase()}')">${w}</span>`
   ).join('');
+}
+
+
+
+// ══════════════════════════════════════
+// VOCAB NOTES — Supabase backed
+// ══════════════════════════════════════
+let vnData = []; // local cache
+
+async function loadVocabNotes(){
+  if(!currentUser) return;
+  const {data} = await sb.from('vocab_notes')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', {ascending: false});
+  if(data) vnData = data;
+  renderVocabNotes();
+}
+
+async function addVocabNote(){
+  const wordEl    = document.getElementById('vn-word');
+  const meaningEl = document.getElementById('vn-meaning');
+  const word    = wordEl.value.trim();
+  const meaning = meaningEl.value.trim();
+  if(!word || !meaning){ toast('Nhập từ và nghĩa nhé!'); return; }
+
+  const note = {
+    user_id: currentUser.id,
+    word: word,
+    meaning: meaning,
+    created_at: new Date().toISOString()
+  };
+
+  // Optimistic UI
+  vnData.unshift({...note, id: 'temp-'+Date.now()});
+  renderVocabNotes();
+  wordEl.value = ''; meaningEl.value = '';
+  wordEl.focus();
+  toast('✓ Đã thêm: ' + word);
+
+  // Save to Supabase
+  const {data, error} = await sb.from('vocab_notes').insert(note).select().single();
+  if(data){
+    // Replace temp with real record
+    const idx = vnData.findIndex(v => v.id && v.id.toString().startsWith('temp-'));
+    if(idx > -1) vnData[idx] = data;
+    renderVocabNotes();
+  }
+}
+
+async function deleteVocabNote(id){
+  vnData = vnData.filter(v => v.id !== id);
+  renderVocabNotes();
+  await sb.from('vocab_notes').delete().eq('id', id);
+  toast('Đã xoá từ');
+}
+
+function renderVocabNotes(){
+  const search = (document.getElementById('vn-search')?.value || '').toLowerCase();
+  const filtered = vnData.filter(v =>
+    v.word.toLowerCase().includes(search) ||
+    v.meaning.toLowerCase().includes(search)
+  );
+
+  const countEl = document.getElementById('vn-count');
+  if(countEl) countEl.textContent = vnData.length + ' từ';
+
+  const list = document.getElementById('vn-list');
+  if(!list) return;
+
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="vn-empty">${search ? 'Không tìm thấy từ "'+search+'"' : 'Chưa có từ nào — thêm từ mới bên trên!'}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(v => {
+    const date = v.created_at ? new Date(v.created_at).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'}) : '';
+    return `<div class="vn-item">
+      <span class="vn-word">${highlight(v.word, search)}</span>
+      <span class="vn-sep">—</span>
+      <span class="vn-meaning">${highlight(v.meaning, search)}</span>
+      <span class="vn-date">${date}</span>
+      <button class="vn-del" onclick="deleteVocabNote('${v.id}')" title="Xoá">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function highlight(text, search){
+  if(!search) return text;
+  const re = new RegExp('('+search.replace(/[.*+?^${}()|[\]\]/g,'\$&')+')', 'gi');
+  return text.replace(re, '<mark style="background:var(--writing-bg);color:var(--writing);border-radius:3px;padding:0 2px">$1</mark>');
 }
 
 
