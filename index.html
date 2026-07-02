@@ -383,6 +383,54 @@ textarea::placeholder{color:var(--ink3)}
 .vn-search:focus{border-color:var(--writing)}
 .vn-search::placeholder{color:var(--ink3)}
 
+
+/* ── TOPIC PRACTICE ── */
+.topic-cat{margin-bottom:1.25rem}
+.topic-cat-title{
+  font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:8px;
+}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.topic-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:12px 14px;
+  cursor:pointer;transition:all .2s;
+}
+.topic-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:var(--border2)}
+.topic-card.done-topic{border-color:var(--podcast);background:var(--podcast-bg)}
+.topic-emoji{font-size:20px;margin-bottom:6px}
+.topic-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.4}
+.topic-card.done-topic .topic-name{color:var(--podcast)}
+.topic-badge{
+  font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;
+  background:var(--border);color:var(--ink3);margin-top:6px;display:inline-block;
+}
+.topic-card.done-topic .topic-badge{background:var(--podcast);color:#fff}
+
+/* Detail */
+.td-emoji{font-size:32px;margin-bottom:8px}
+.td-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.td-cat{font-size:12px;color:var(--ink3);margin-bottom:16px}
+.td-section{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;margin-top:16px}
+.td-questions{display:flex;flex-direction:column;gap:8px}
+.td-q{
+  padding:10px 14px;border-radius:var(--radius);
+  background:var(--paper);border:1px solid var(--border);
+  font-size:13px;color:var(--ink);line-height:1.5;
+}
+.td-keywords{display:flex;flex-wrap:wrap;gap:6px}
+.td-kw{
+  font-size:12px;font-weight:500;padding:4px 12px;border-radius:99px;
+  background:var(--speaking-bg);color:var(--speaking);border:1px solid var(--speaking);
+}
+.td-done-btn{
+  width:100%;padding:12px;margin-top:20px;border-radius:var(--radius-lg);
+  border:none;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .15s;
+}
+.td-done-btn.mark{background:var(--podcast);color:#fff}
+.td-done-btn.unmark{background:var(--paper);border:1px solid var(--border2);color:var(--ink2)}
+
 .hidden{display:none!important}
 /* ── BOTTOM NAV ── */
 .bottom-nav{
@@ -668,6 +716,10 @@ textarea::placeholder{color:var(--ink3)}
     <button class="nav-tab" onclick="switchPage('flashcard')" id="tab-flashcard">
       <span class="nav-tab-icon">🃏</span>
       <span class="nav-tab-label">Flashcard</span>
+    </button>
+    <button class="nav-tab" onclick="switchPage('topic')" id="tab-topic">
+      <span class="nav-tab-icon">💬</span>
+      <span class="nav-tab-label">Topics</span>
     </button>
   </nav>
 
@@ -1146,16 +1198,7 @@ function toast(msg){
 }
 
 
-// ══════════════════════════════════════
-// PAGE SWITCHING
-// ══════════════════════════════════════
-function switchPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('tab-'+page).classList.add('active');
-  if(page==='flashcard') initFlashcard();
-}
+// PAGE SWITCHING moved to TOPIC PRACTICE section
 
 // ══════════════════════════════════════
 // FLASHCARD DATA — 100 Hospitality Phrases
@@ -1805,6 +1848,283 @@ function highlight(text, search){
   const escaped = search.replace(/[.*+?^${}()|[\\\]]/g,'\\$&');
   const re = new RegExp('(' + escaped + ')', 'gi');
   return text.replace(re, '<mark style="background:var(--writing-bg);color:var(--writing);border-radius:3px;padding:0 2px">$1</mark>');
+}
+
+
+
+// ══════════════════════════════════════
+// TOPIC PRACTICE
+// ══════════════════════════════════════
+const TOPICS = [
+  // 🏠 Cuộc sống hàng ngày
+  {id:1, cat:'🏠 Cuộc sống hàng ngày', emoji:'🌅', name:'Buổi sáng của bạn',
+   questions:['Describe your morning routine from wake up to leaving home.','What time do you usually wake up and why?','Do you eat breakfast every day? What do you usually have?'],
+   keywords:['wake up','routine','breakfast','get dressed','leave home','rush','alarm']},
+  {id:2, cat:'🏠 Cuộc sống hàng ngày', emoji:'🍜', name:'Bữa ăn yêu thích',
+   questions:['What is your favorite meal and why?','Do you prefer cooking at home or eating out?','Describe the last meal you really enjoyed.'],
+   keywords:['favorite dish','ingredients','taste','spicy','sweet','cook','restaurant','homemade']},
+  {id:3, cat:'🏠 Cuộc sống hàng ngày', emoji:'🛋️', name:'Cuối tuần của bạn',
+   questions:['What do you usually do on weekends?','Do you prefer staying home or going out on weekends?','Describe your perfect weekend.'],
+   keywords:['relax','hang out','family time','hobby','rest','outing','lazy day']},
+  {id:4, cat:'🏠 Cuộc sống hàng ngày', emoji:'🏡', name:'Ngôi nhà của bạn',
+   questions:['Describe your home.','What is your favorite room and why?','What would you change about your home if you could?'],
+   keywords:['living room','bedroom','cozy','messy','tidy','neighborhood','apartment']},
+  {id:5, cat:'🏠 Cuộc sống hàng ngày', emoji:'🌙', name:'Thói quen trước khi ngủ',
+   questions:['What do you do before going to bed?','Do you have a bedtime routine?','What time do you usually sleep and do you get enough rest?'],
+   keywords:['bedtime','scroll phone','brush teeth','read','wind down','insomnia','tired']},
+
+  // 💼 Công việc
+  {id:6, cat:'💼 Công việc', emoji:'📋', name:'Một ngày làm việc',
+   questions:['Describe a typical workday for you.','What is the first thing you do when you arrive at the office?','How do you manage your tasks during the day?'],
+   keywords:['meeting','deadline','task','report','stakeholder','review','handover']},
+  {id:7, cat:'💼 Công việc', emoji:'🧩', name:'Dự án khó khăn nhất',
+   questions:['What was the most challenging project you have worked on?','How did you overcome the difficulties?','What did you learn from that experience?'],
+   keywords:['challenge','obstacle','solution','teamwork','pressure','deliver','lesson learned']},
+  {id:8, cat:'💼 Công việc', emoji:'❤️', name:'Điều bạn thích ở công việc',
+   questions:['What do you enjoy most about your current job?','What motivates you to go to work every day?','What makes your job meaningful to you?'],
+   keywords:['passion','growth','impact','team','environment','satisfaction','contribute']},
+  {id:9, cat:'💼 Công việc', emoji:'🤝', name:'Quan hệ đồng nghiệp',
+   questions:['How is your relationship with your colleagues?','Have you ever had a conflict at work? How did you handle it?','Who inspires you most at your workplace?'],
+   keywords:['colleague','collaborate','conflict','support','communication','respect','teamwork']},
+  {id:10, cat:'💼 Công việc', emoji:'🚀', name:'Kế hoạch nghề nghiệp',
+   questions:['Where do you see yourself in 5 years?','What skills do you want to develop?','Are you happy with your current career path?'],
+   keywords:['career goal','promotion','skill','opportunity','switch career','grow','ambition']},
+
+  // 🧠 Suy nghĩ & Cảm xúc
+  {id:11, cat:'🧠 Suy nghĩ & Cảm xúc', emoji:'😰', name:'Điều khiến bạn stress',
+   questions:['What stresses you out the most in daily life?','How do you deal with stress?','Do you think stress can be positive sometimes?'],
+   keywords:['stress','overwhelmed','deadline','cope','breathe','pressure','burnout']},
+  {id:12, cat:'🧠 Suy nghĩ & Cảm xúc', emoji:'🏆', name:'Điều bạn tự hào',
+   questions:['What are you most proud of in your life?','Describe a moment when you felt very proud of yourself.','What achievement means the most to you?'],
+   keywords:['proud','achievement','overcome','milestone','effort','reward','self-confidence']},
+  {id:13, cat:'🧠 Suy nghĩ & Cảm xúc', emoji:'😤', name:'Xử lý cảm xúc tiêu cực',
+   questions:['How do you handle negative emotions like anger or sadness?','What do you do when you feel frustrated?','Do you talk to someone or prefer to be alone when upset?'],
+   keywords:['angry','sad','frustrated','calm down','vent','reflect','move on']},
+  {id:14, cat:'🧠 Suy nghĩ & Cảm xúc', emoji:'😊', name:'Điều mang lại hạnh phúc',
+   questions:['What makes you happy every day?','Do you think happiness is a choice?','What simple things bring you joy?'],
+   keywords:['happiness','grateful','appreciate','small things','positive','smile','contentment']},
+  {id:15, cat:'🧠 Suy nghĩ & Cảm xúc', emoji:'😨', name:'Nỗi sợ lớn nhất',
+   questions:['What is your biggest fear?','Have you ever faced your fear? What happened?','How do you overcome fear?'],
+   keywords:['fear','afraid','phobia','courage','face it','overcome','anxiety']},
+
+  // 👨‍👩‍👧 Gia đình & Bạn bè
+  {id:16, cat:'👨‍👩‍👧 Gia đình & Bạn bè', emoji:'💑', name:'Về vợ/chồng bạn',
+   questions:['Describe your partner.','What do you love most about your partner?','How do you two spend quality time together?'],
+   keywords:['partner','love','support','understand','compromise','together','relationship']},
+  {id:17, cat:'👨‍👩‍👧 Gia đình & Bạn bè', emoji:'📸', name:'Kỷ niệm gia đình',
+   questions:['What is your most memorable family moment?','Describe a family tradition you love.','What is something your family always does together?'],
+   keywords:['memory','tradition','holiday','gather','bond','childhood','celebrate']},
+  {id:18, cat:'👨‍👩‍👧 Gia đình & Bạn bè', emoji:'👫', name:'Người bạn thân nhất',
+   questions:['Tell me about your best friend.','How did you meet your best friend?','What qualities do you value in a friendship?'],
+   keywords:['trust','loyalty','support','laugh','share','honest','long-time friend']},
+  {id:19, cat:'👨‍👩‍👧 Gia đình & Bạn bè', emoji:'👨‍👩‍👦', name:'Học từ bố mẹ',
+   questions:['What is the most important lesson your parents taught you?','How have your parents influenced who you are today?','What do you admire most about your parents?'],
+   keywords:['lesson','value','hardworking','sacrifice','grateful','influence','respect']},
+  {id:20, cat:'👨‍👩‍👧 Gia đình & Bạn bè', emoji:'🎁', name:'Điều muốn làm cho gia đình',
+   questions:['What do you want to do for your family in the future?','How do you show love to your family?','What is one thing you wish you could give your family?'],
+   keywords:['provide','support','care','dream house','travel together','quality time','give back']},
+
+  // 🌍 Xã hội & Quan điểm
+  {id:21, cat:'🌍 Xã hội & Quan điểm', emoji:'📱', name:'Mạng xã hội',
+   questions:['What do you think about social media?','How much time do you spend on social media daily?','Do you think social media has more pros or cons?'],
+   keywords:['social media','addicted','influence','compare','fake','connect','digital detox']},
+  {id:22, cat:'🌍 Xã hội & Quan điểm', emoji:'💰', name:'Tiền bạc có phải tất cả',
+   questions:['Do you think money is everything?','Can money buy happiness?','How has your view on money changed over time?'],
+   keywords:['money','wealth','happiness','priority','enough','financial freedom','materialism']},
+  {id:23, cat:'🌍 Xã hội & Quan điểm', emoji:'🎯', name:'Thành công là gì',
+   questions:['How do you define success?','Do you consider yourself successful?','What does a successful life look like to you?'],
+   keywords:['success','define','balance','achievement','fulfillment','measure','society']},
+  {id:24, cat:'🌍 Xã hội & Quan điểm', emoji:'📚', name:'Tự học',
+   questions:['What do you think about self-studying?','What have you learned on your own that school never taught you?','What is the hardest part of learning by yourself?'],
+   keywords:['self-study','discipline','motivation','resource','trial and error','consistency','growth']},
+  {id:25, cat:'🌍 Xã hội & Quan điểm', emoji:'🌏', name:'Thay đổi xã hội',
+   questions:['What would you change about society if you could?','What social issue concerns you the most?','How can individuals make a difference in society?'],
+   keywords:['society','change','issue','environment','education','equality','contribute']},
+
+  // ✈️ Du lịch & Trải nghiệm
+  {id:26, cat:'✈️ Du lịch & Trải nghiệm', emoji:'🗺️', name:'Chuyến đi đáng nhớ nhất',
+   questions:['Describe your most memorable trip.','Where did you go and what made it special?','Would you go back to that place? Why?'],
+   keywords:['destination','journey','experience','culture','memory','adventure','explore']},
+  {id:27, cat:'✈️ Du lịch & Trải nghiệm', emoji:'🌟', name:'Nơi muốn đến nhất',
+   questions:['Where do you want to travel most?','Why does that place attract you?','What would you do there?'],
+   keywords:['dream destination','bucket list','culture','scenery','local food','explore','someday']},
+  {id:28, cat:'✈️ Du lịch & Trải nghiệm', emoji:'🎒', name:'Du lịch một mình hay nhóm',
+   questions:['Do you prefer traveling alone or with others?','What are the pros and cons of each?','Have you ever traveled alone?'],
+   keywords:['solo travel','group trip','freedom','plan','flexible','safety','bond']},
+  {id:29, cat:'✈️ Du lịch & Trải nghiệm', emoji:'✨', name:'Trải nghiệm lần đầu đáng nhớ',
+   questions:['What is a first-time experience you will never forget?','How did you feel the first time you did something new?','What first experiences changed your perspective?'],
+   keywords:['first time','nervous','excited','unforgettable','brave','new experience','perspective']},
+  {id:30, cat:'✈️ Du lịch & Trải nghiệm', emoji:'🌐', name:'Văn hóa nước ngoài',
+   questions:['Which foreign culture do you find most interesting?','What cultural differences have surprised you?','Is there a foreign tradition you wish Vietnam had?'],
+   keywords:['culture','tradition','custom','difference','respect','open-minded','diversity']},
+
+  // 📱 Công nghệ & Xu hướng
+  {id:31, cat:'📱 Công nghệ & Xu hướng', emoji:'📲', name:'App dùng nhiều nhất',
+   questions:['What apps do you use most every day?','Could you survive without your smartphone?','What app has changed your life the most?'],
+   keywords:['app','smartphone','depend','productivity','entertainment','habit','screen time']},
+  {id:32, cat:'📱 Công nghệ & Xu hướng', emoji:'🤖', name:'AI thay đổi công việc',
+   questions:['How is AI changing your job?','Are you afraid AI will replace your role?','What tasks do you use AI for at work?'],
+   keywords:['AI','automation','replace','tool','efficiency','adapt','future of work']},
+  {id:33, cat:'📱 Công nghệ & Xu hướng', emoji:'🏠', name:'Làm việc remote',
+   questions:['What do you think about working from home?','What are the challenges of remote work?','Do you prefer office or remote work?'],
+   keywords:['remote work','work from home','flexible','distraction','productive','balance','commute']},
+  {id:34, cat:'📱 Công nghệ & Xu hướng', emoji:'👁️', name:'Ảnh hưởng của mạng xã hội',
+   questions:['How does social media affect your daily life?','Have you ever taken a break from social media?','Do you think social media affects your mental health?'],
+   keywords:['influence','compare','pressure','FOMO','scroll','detox','mental health']},
+  {id:35, cat:'📱 Công nghệ & Xu hướng', emoji:'⚡', name:'Công nghệ không thể thiếu',
+   questions:['What technology can you not live without?','How would your life change without the internet?','What technology do you wish existed?'],
+   keywords:['essential','internet','depend','disconnect','convenience','innovation','future']},
+
+  // 💪 Sức khỏe & Thói quen
+  {id:36, cat:'💪 Sức khỏe & Thói quen', emoji:'🏃', name:'Giữ sức khỏe',
+   questions:['How do you take care of your health?','Do you exercise regularly? What do you do?','What healthy habits do you have?'],
+   keywords:['exercise','diet','sleep','healthy','routine','gym','walk','nutrition']},
+  {id:37, cat:'💪 Sức khỏe & Thói quen', emoji:'✅', name:'Thói quen tốt đang xây dựng',
+   questions:['What good habit are you trying to build?','How long have you been working on it?','What helps you stay consistent?'],
+   keywords:['habit','consistent','discipline','track','progress','routine','small steps']},
+  {id:38, cat:'💪 Sức khỏe & Thói quen', emoji:'❌', name:'Thói quen xấu muốn bỏ',
+   questions:['What bad habit do you want to quit?','What triggers this bad habit?','What have you tried to stop it?'],
+   keywords:['bad habit','quit','trigger','replace','willpower','relapse','overcome']},
+  {id:39, cat:'💪 Sức khỏe & Thói quen', emoji:'😴', name:'Giấc ngủ của bạn',
+   questions:['How many hours do you sleep each night?','Do you feel rested when you wake up?','What affects your sleep quality?'],
+   keywords:['sleep','tired','rest','insomnia','bedtime','energy','quality sleep']},
+  {id:40, cat:'💪 Sức khỏe & Thói quen', emoji:'🏋️', name:'Tập thể dục',
+   questions:['Do you exercise? What kind?','How do you motivate yourself to work out?','What stops you from exercising regularly?'],
+   keywords:['workout','gym','lazy','motivated','consistent','result','energy','healthy']},
+
+  // 🎯 Mục tiêu & Động lực
+  {id:41, cat:'🎯 Mục tiêu & Động lực', emoji:'🏹', name:'Mục tiêu năm nay',
+   questions:['What is your biggest goal this year?','How are you working toward it?','What obstacles are you facing?'],
+   keywords:['goal','plan','progress','deadline','commit','achieve','milestone']},
+  {id:42, cat:'🎯 Mục tiêu & Động lực', emoji:'⚡', name:'Điều thúc đẩy bạn',
+   questions:['What motivates you every morning?','What keeps you going when things get hard?','Do you have a personal motto or mantra?'],
+   keywords:['motivation','purpose','why','drive','inspiration','push through','mindset']},
+  {id:43, cat:'🎯 Mục tiêu & Động lực', emoji:'💔', name:'Xử lý thất bại',
+   questions:['How do you handle failure?','Can you share a time you failed and what you learned?','Do you think failure is necessary for success?'],
+   keywords:['failure','lesson','bounce back','resilience','accept','grow','try again']},
+  {id:44, cat:'🎯 Mục tiêu & Động lực', emoji:'⭐', name:'Người truyền cảm hứng',
+   questions:['Who inspires you the most?','What qualities do you admire in them?','How has this person influenced your life?'],
+   keywords:['inspire','role model','admire','qualities','influence','follow','learn from']},
+  {id:45, cat:'🎯 Mục tiêu & Động lực', emoji:'🌈', name:'Cuộc sống thành công',
+   questions:['How do you define a successful life?','Is success different for everyone?','Are you living the life you imagined 5 years ago?'],
+   keywords:['success','fulfillment','balance','meaningful','compare','own definition','journey']},
+
+  // 🎵 Sở thích & Giải trí
+  {id:46, cat:'🎵 Sở thích & Giải trí', emoji:'🎵', name:'Âm nhạc yêu thích',
+   questions:['What kind of music do you enjoy?','Does music affect your mood?','Is there a song that means a lot to you?'],
+   keywords:['genre','lyrics','mood','playlist','concert','artist','emotion']},
+  {id:47, cat:'🎵 Sở thích & Giải trí', emoji:'🎬', name:'Phim ảnh hưởng đến bạn',
+   questions:['What movie or series has impacted you the most?','Why did it affect you so deeply?','Would you recommend it to others?'],
+   keywords:['movie','series','character','message','emotional','recommend','scene']},
+  {id:48, cat:'🎵 Sở thích & Giải trí', emoji:'🎮', name:'Sở thích ngoài công việc',
+   questions:['What do you enjoy doing in your free time?','How did you develop this hobby?','Does your hobby help you relax or grow?'],
+   keywords:['hobby','passion','relax','creative','skill','enjoy','unwind']},
+  {id:49, cat:'🎵 Sở thích & Giải trí', emoji:'📖', name:'Cuốn sách hay nhất',
+   questions:['What is the best book you have ever read?','What did you learn from it?','Do you prefer fiction or non-fiction?'],
+   keywords:['book','read','knowledge','fiction','recommend','lesson','author']},
+  {id:50, cat:'🎵 Sở thích & Giải trí', emoji:'🌴', name:'Một ngày tự do hoàn toàn',
+   questions:['If you had a completely free day, what would you do?','Would you spend it alone or with others?','What would your perfect free day look like?'],
+   keywords:['free day','relax','adventure','spontaneous','recharge','do nothing','explore']},
+];
+
+let doneTopic = JSON.parse(localStorage.getItem('done_topics')||'[]');
+let currentTopicId = null;
+
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('tab-'+page).classList.add('active');
+  if(page==='flashcard') initFlashcard();
+  if(page==='topic') renderTopics();
+}
+
+function renderTopics(){
+  const search = (document.getElementById('topic-search')?.value||'').toLowerCase();
+  const filtered = TOPICS.filter(t =>
+    t.name.toLowerCase().includes(search) ||
+    t.cat.toLowerCase().includes(search) ||
+    t.keywords.some(k=>k.toLowerCase().includes(search))
+  );
+
+  // Group by category
+  const cats = [...new Set(filtered.map(t=>t.cat))];
+  const container = document.getElementById('topic-cat-list');
+  if(!container) return;
+
+  if(filtered.length === 0){
+    container.innerHTML = '<div class="vn-empty">Không tìm thấy chủ đề nào</div>';
+    return;
+  }
+
+  container.innerHTML = cats.map(cat => {
+    const topics = filtered.filter(t=>t.cat===cat);
+    return `<div class="topic-cat">
+      <div class="topic-cat-title">${cat}</div>
+      <div class="topic-grid">
+        ${topics.map(t => {
+          const done = doneTopic.includes(t.id);
+          return `<div class="topic-card${done?' done-topic':''}" onclick="openTopic(${t.id})">
+            <div class="topic-emoji">${t.emoji}</div>
+            <div class="topic-name">${t.name}</div>
+            <span class="topic-badge">${done?'✓ Đã luyện':'${t.questions.length} câu hỏi'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Fix badge text (template literal inside string issue)
+  container.querySelectorAll('.topic-badge').forEach((el,i) => {
+    if(el.textContent.includes('${t.questions.length}')){
+      const topicId = parseInt(container.querySelectorAll('.topic-card')[i]?.getAttribute('onclick')?.match(/\d+/)?.[0]);
+      const t = TOPICS.find(x=>x.id===topicId);
+      if(t) el.textContent = t.questions.length + ' câu hỏi';
+    }
+  });
+}
+
+function openTopic(id){
+  const t = TOPICS.find(x=>x.id===id);
+  if(!t) return;
+  currentTopicId = id;
+  const done = doneTopic.includes(id);
+
+  document.getElementById('topic-detail').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div class="td-emoji">${t.emoji}</div>
+      <div class="td-title">${t.name}</div>
+      <div class="td-cat">${t.cat}</div>
+    </div>
+    <div class="td-section">💬 Câu hỏi gợi ý</div>
+    <div class="td-questions">
+      ${t.questions.map(q=>`<div class="td-q">❓ ${q}</div>`).join('')}
+    </div>
+    <div class="td-section">🔑 Keywords cần dùng</div>
+    <div class="td-keywords">
+      ${t.keywords.map(k=>`<span class="td-kw">${k}</span>`).join('')}
+    </div>
+    <button class="td-done-btn ${done?'unmark':'mark'}" onclick="toggleTopicDone(${id})">
+      ${done?'↩ Đánh dấu chưa luyện':'✓ Đánh dấu đã luyện'}
+    </button>
+  `;
+  document.getElementById('topic-overlay').classList.remove('hidden');
+}
+
+function toggleTopicDone(id){
+  if(doneTopic.includes(id)){
+    doneTopic = doneTopic.filter(x=>x!==id);
+  } else {
+    doneTopic.push(id);
+  }
+  localStorage.setItem('done_topics', JSON.stringify(doneTopic));
+  closeTopic();
+  renderTopics();
+  toast(doneTopic.includes(id)?'✓ Đã luyện rồi!':'Đánh dấu chưa luyện');
+}
+
+function closeTopic(){
+  document.getElementById('topic-overlay').classList.add('hidden');
 }
 
 
