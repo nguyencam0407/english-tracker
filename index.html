@@ -873,6 +873,24 @@ textarea::placeholder{color:var(--ink3)}
     </div>
   </div><!-- end page-flashcard -->
 
+  <!-- PAGE: Topic Practice -->
+  <div class="page" id="page-topic">
+    <div class="fc-wrap">
+      <div class="fc-top" style="margin-bottom:1rem">
+        <div class="fc-title">💬 Topic Practice</div>
+        <div style="font-size:12px;color:var(--ink3)">50 chủ đề luyện nói</div>
+      </div>
+      <input class="vn-search" id="topic-search" placeholder="🔍 Tìm chủ đề..." oninput="renderTopics()" style="margin-bottom:1rem"/>
+      <div id="topic-cat-list"></div>
+    </div>
+    <div class="vocab-overlay hidden" id="topic-overlay" onclick="closeTopic()">
+      <div style="background:var(--card);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:24px 20px 40px;width:100%;max-height:85vh;overflow-y:auto;position:relative" onclick="event.stopPropagation()">
+        <div class="vocab-close" onclick="closeTopic()">✕</div>
+        <div id="topic-detail"></div>
+      </div>
+    </div>
+  </div><!-- end page-topic -->
+
 </div>
 
 
