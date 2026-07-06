@@ -2180,9 +2180,13 @@ function openTopic(id){
     <div class="td-keywords">
       ${t.keywords.map(k=>`<span class="td-kw">${k}</span>`).join('')}
     </div>
-    <div class="td-section">📚 Từ vựng chủ đề (${(TOPIC_VOCAB[t.id]||[]).length} từ)</div>
+    <div class="td-section">📚 Từ vựng chủ đề (${(TOPIC_VOCAB[t.id]||[]).length} từ) — bấm 🔊 để nghe</div>
     <div class="td-questions">
-      ${(TOPIC_VOCAB[t.id]||[]).map(v=>`<div class="td-q" style="display:flex;justify-content:space-between;gap:10px"><b style="color:var(--speaking)">${v.w}</b><span style="color:var(--ink2);text-align:right">${v.m}</span></div>`).join('')}
+      ${(TOPIC_VOCAB[t.id]||[]).map((v,vi)=>`<div class="td-q" style="display:flex;align-items:center;gap:10px">
+        <button onclick="speakVocab(this, \`${v.w.replace(/`/g,'')}\`)" style="background:var(--speaking-bg);border:1px solid var(--speaking);border-radius:50%;width:30px;height:30px;min-width:30px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s" title="Nghe phát âm">🔊</button>
+        <b style="color:var(--speaking);flex:1">${v.w}</b>
+        <span style="color:var(--ink2);text-align:right">${v.m}</span>
+      </div>`).join('')}
     </div>
     <button class="td-done-btn ${done?'unmark':'mark'}" onclick="toggleTopicDone(${id})">
       ${done?'↩ Đánh dấu chưa luyện':'✓ Đánh dấu đã luyện'}
@@ -2205,6 +2209,66 @@ function toggleTopicDone(id){
 
 function closeTopic(){
   document.getElementById('topic-overlay').classList.add('hidden');
+}
+
+
+
+// Speak a vocab word — reuses main TTS system
+let vocabAudio = null;
+async function speakVocab(btn, word){
+  // Stop any playing vocab audio
+  if(vocabAudio){ vocabAudio.pause(); vocabAudio = null; }
+  if(window.speechSynthesis) speechSynthesis.cancel();
+
+  const originalText = btn.textContent;
+  btn.textContent = '⏳';
+
+  const userEmail = currentUser?.email || '';
+  const isPremium = userEmail === 'nmcam@gmail.com';
+
+  if(isPremium){
+    try {
+      let audioUrl = ttsCache['vocab:'+word];
+      if(!audioUrl){
+        const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${XI_VOICE}/stream`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','xi-api-key':XI_KEY},
+          body: JSON.stringify({
+            text: word,
+            model_id: XI_MODEL,
+            voice_settings:{stability:0.8, similarity_boost:0.8, style:0.1, use_speaker_boost:true}
+          })
+        });
+        if(!res.ok) throw new Error('TTS error');
+        const blob = await res.blob();
+        audioUrl = URL.createObjectURL(blob);
+        ttsCache['vocab:'+word] = audioUrl;
+      }
+      vocabAudio = new Audio(audioUrl);
+      vocabAudio.onended = () => { btn.textContent = originalText; };
+      vocabAudio.onerror = () => { btn.textContent = originalText; vocabFallback(word, btn, originalText); };
+      await vocabAudio.play();
+      btn.textContent = '🔉';
+      vocabAudio.onended = () => { btn.textContent = '🔊'; };
+      return;
+    } catch(e){ /* fall through */ }
+  }
+  vocabFallback(word, btn, originalText);
+}
+
+function vocabFallback(word, btn, originalText){
+  if(!window.speechSynthesis){ btn.textContent = '🔊'; return; }
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(v=>v.lang==='en-US') || voices.find(v=>v.lang.startsWith('en'));
+  if(v) u.voice = v;
+  u.onstart = () => { btn.textContent = '🔉'; };
+  u.onend   = () => { btn.textContent = '🔊'; };
+  u.onerror = () => { btn.textContent = '🔊'; };
+  speechSynthesis.cancel();
+  setTimeout(()=>speechSynthesis.speak(u), 50);
 }
 
 
